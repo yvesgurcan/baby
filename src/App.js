@@ -19,6 +19,54 @@ class Header extends Component {
   }
 }
 
+class ShowSurvey extends Component {
+  render() {
+    return (
+      <div>show survey</div>
+    )
+  }
+}
+
+class Questions extends Component {
+  render() {
+    return (
+      <div>questions</div>
+    )
+  }
+}
+
+class CreateProfile extends Component {
+  render() {
+    return (
+      <Col xs={12}>
+        create profile
+        <Button
+          block
+          bsSize="large"
+          bsStyle="primary"
+          onClick={this.props.submitProfile}
+        >Create Profile</Button>
+      </Col>
+    )
+  }
+}
+
+class Announcement extends Component {
+  render() {
+    return (
+      <Col xs={12}>
+        the picture
+        <Button
+          block
+          bsSize="large"
+          bsStyle="primary"
+          onClick={this.props.goToNewProfilePage}
+        >Yes!</Button>
+      </Col>
+    )
+  }
+}
+
 class Login extends Component {
   constructor (props) {
     super(props)
@@ -63,9 +111,9 @@ class Login extends Component {
             </Alert>
           }
           <Button
+            block
             bsStyle="primary"
             bsSize="large"
-            block
             className="margin-bottom"
             onClick={this.props.submitLogin}
           >Enter</Button>
@@ -76,41 +124,12 @@ class Login extends Component {
   }
 }
 
-class Announcement extends Component {
-  render() {
-    return (
-      <div>announcement</div>
-    )
-  }
-}
-
-class CreateProfile extends Component {
-  render() {
-    return (
-      <div>create profile</div>
-    )
-  }
-}
-
-class Questions extends Component {
-  render() {
-    return (
-      <div>questions</div>
-    )
-  }
-}
-
-class ShowSurvey extends Component {
-  render() {
-    return (
-      <div>show survey</div>
-    )
-  }
-}
-
 function mockAPI(method,endpoint,data) {
   if (endpoint === "login") {
     return {authorized: true, currentPage: "announcement"}
+  }
+  if (endpoint === "createUser") {
+    return {userCreated: true, currentPage: "questions"}
   }
 }
  
@@ -119,7 +138,7 @@ class PageSelector extends Component {
     super(props)
     // state
     this.state = {
-      response: {currentPage: "login"},
+      currentPage: "login",
       user: "",
       password: "",
       errors: {},
@@ -139,7 +158,7 @@ class PageSelector extends Component {
     let state = this.state
     // console.log(input.target)
     state[input.target.name] = input.target.value
-    this.setState({state})
+    this.setState(state)
   }
   submitLogin() {
     let error = false
@@ -168,7 +187,7 @@ class PageSelector extends Component {
     }
 
     if (error) {
-      this.setState({errorMessages})
+      this.setState(errorMessages)
     }
     else {
       this.api(
@@ -179,12 +198,24 @@ class PageSelector extends Component {
     }
   }
   goToNewProfilePage() {
+    this.setState({currentPage: "createProfile"})
   }
   storeProfileData() {
 
   }
   submitProfile() {
-
+    let error = false
+    let errorMessages = this.state.errors
+    if (error) {
+      this.setState(errorMessages)
+    }
+    else {
+      this.api(
+        "get",
+        "createUser",
+        {}
+      ) 
+    }
   }
   storeAnswersData() {
 
@@ -199,13 +230,13 @@ class PageSelector extends Component {
     console.log(method, endpoint, data)
     let response = mockAPI(method,endpoint,data)
     console.log(response)
-    this.setState({response})
+    this.setState(response)
   }
   render() {
     // chooses appropriate page to show
     let showFlags = true
     let currentPage = null
-    switch (this.state.response.currentPage) {
+    switch (this.state.currentPage) {
       default:
         currentPage = <Flags mainPage/>
         showFlags = false
@@ -223,12 +254,15 @@ class PageSelector extends Component {
       case "announcement":
         currentPage = (
           <Announcement
+            goToNewProfilePage={this.goToNewProfilePage}
           />
         )
         break
       case "createProfile":
         currentPage = (
           <CreateProfile
+            storeProfileData={this.storeProfileData}
+            submitProfile={this.submitProfile}
           />
         )
         break
