@@ -39,44 +39,44 @@ class CreateProfile extends Component {
   daysOfTheMonth() {
     let days = []
     const totalDays = new Date(this.props.year, this.props.month, 0).getDate()
-    console.log(totalDays)
+    // console.log(totalDays)
     for (var i = 1; i <= totalDays; i++) {
-      days.push(<option value={i}>{i}</option>)
+      days.push(<option  key={i} value={i}>{i}</option>)
     }
     return days
   }
   months() {
     const listOfMonths = ["January","February","March","April","May","June","July","August","September","October","November","December"]
     let months = listOfMonths.map((month, index) => {
-      return <option value={index+1}>{month}</option>
+      return <option key={month} value={index+1}>{month}</option>
     })
     return months
   }
   years() {
     let years = []
     for (var i = 1935; i <= 2010; i++) {
-      years.push(<option value={i}>{i}</option>)
+      years.push(<option key={i} value={i}>{i}</option>)
     }
     return years
   }
   ageCategories() {
     const categories = [{id:"24+",name:"24 -"},{id:"25-49",name:"25-49"},{id:"50-74",name:"50-74"},{id:"75+",name:"75+"}]
     let ageCategories = categories.map((category) => {
-      return <option value={category.id}>{category.name}</option>
+      return <option key={category.id} value={category.id}>{category.name}</option>
     })
     return ageCategories
   }
   residences() {
     const countries = [{id:"france",name:"France"},{id:"usa",name:"United States"}]
     let residence = countries.map((country) => {
-      return <option value={country.id}>{country.name}</option>
+      return <option key={country.id} value={country.id}>{country.name}</option>
     })
     return residence
   }
   relationships() {
     const relations = [{id: "relative", name:"Relative"},{id:"friend",name:"Friend"},{id:"coworker",name:"Coworker"}]
     let relationships = relations.map((relation) => {
-      return <option value={relation.id}>{relation.name}</option>
+      return <option key={relation.id} value={relation.id}>{relation.name}</option>
     })
     return relationships
   }
@@ -190,8 +190,8 @@ class CreateProfile extends Component {
         </Row>
         <Col sm={6}>
           <FormControl
-            name="residence"
-            value={this.props.residence}
+            name="country"
+            value={this.props.country}
             componentClass="select"
             bsSize="large"
             className="margin-bottom"
@@ -227,7 +227,74 @@ class Announcement extends Component {
   render() {
     return (
       <Col xs={12}>
-        the picture
+                <svg viewBox="0 -10 570 210">
+                    {/* mushroom 1 */}
+                    {/* hat */}
+                    <circle cx="110" cy="100" r="100" clipPath="url(#cut-off-bottom-mushroom1)" fill="red" stroke="black" strokeWidth="3"></circle>
+                    <clipPath id="cut-off-bottom-mushroom1"><rect x="0" y="-10" width="220" height="100" /></clipPath>
+                    {/* spots on the hat */}
+                    <circle cx="30" cy="35" r="18" fill="white" stroke="none"></circle>
+                    <circle cx="75" cy="65" r="15" fill="white" stroke="none"></circle>
+                    <circle cx="122" cy="21" r="12" fill="white" stroke="none"></circle>
+                    <circle cx="145" cy="75" r="18" fill="white" stroke="none"></circle>
+                    <circle cx="190" cy="50" r="13" fill="white" stroke="none"></circle>
+                    {/* close the circle */}
+                    <circle cx="110" cy="100" r="100" clipPath="url(#cut-off-bottom-mushroom1)" fill="none" stroke="black" strokeWidth="3"></circle>
+                    <line x1="9.15" y1="90" x2="210.85" y2="90" stroke="black" strokeWidth="3"></line>
+                    {/* body */}
+                    <rect width="120" height="100" x="50" y="90" rx="2" ry="2" fill="none" stroke="black" strokeWidth="3"></rect>
+                    {/* eyes */}
+                    <line x1="95" y1="110" x2="95" y2="140" stroke="black" strokeWidth="4"></line>
+                    <line x1="125" y1="110" x2="125" y2="140" stroke="black" strokeWidth="4"></line>
+                    {/* mouth */}
+                    <circle cx="110" cy="145" r="30" clipPath="url(#cut-off-top-mushroom1)" fill="none" stroke="black" strokeWidth="3"></circle>
+                    <clipPath id="cut-off-top-mushroom1"><rect x="0" y="145" width="220" height="100" /></clipPath>
+
+                    {/* mushroom 2 */}
+                    {/* hat */}
+                    <circle cx="285" cy="150" r="65" clipPath="url(#cut-off-bottom-mushroom2)" fill="lightgreen" stroke="black" strokeWidth="3"></circle>
+                    <clipPath id="cut-off-bottom-mushroom2"><rect x="110" y="" width="245" height="145" /></clipPath>
+                    {/* spots on the hat */}
+                    <circle cx="230" cy="125" r="11" fill="white" stroke="none"></circle>
+                    <circle cx="265" cy="140" r="7" fill="white" stroke="none"></circle>
+                    <circle cx="295" cy="105" r="12" fill="white" stroke="none"></circle>
+                    <circle cx="326" cy="126" r="9" fill="white" stroke="none"></circle>
+                    {/* close the circle */}
+                    <circle cx="285" cy="150" r="65" clipPath="url(#cut-off-bottom-mushroom2)" fill="none" stroke="black" strokeWidth="3"></circle>
+                    <line x1="219.15" y1="145" x2="350.85" y2="145" stroke="black" strokeWidth="3"></line>
+                    {/* body */}
+                    <rect width="70" height="50" x="250" y="145" rx="2" ry="2" fill="none" stroke="black" strokeWidth="3"></rect>
+                    {/* eyes */}
+                    <line x1="263" y1="165" x2="273" y2="155" stroke="black" strokeWidth="4"></line>
+                    <line x1="271" y1="155" x2="281" y2="165" stroke="black" strokeWidth="4"></line>
+                    <line x1="288" y1="165" x2="298" y2="155" stroke="black" strokeWidth="4"></line>
+                    <line x1="296" y1="155" x2="306" y2="165" stroke="black" strokeWidth="4"></line>
+                    {/* mouth */}
+                    <line x1="276" y1="175" x2="286" y2="185" stroke="black" strokeWidth="4"></line>
+                    <line x1="284" y1="185" x2="294" y2="175" stroke="black" strokeWidth="4"></line>
+                    
+                    {/* mushroom 3 */}
+                    {/* hat */}
+                    <circle cx="460" cy="100" r="100" clipPath="url(#cut-off-bottom-mushroom3)" fill="orange" stroke="black" strokeWidth="3"></circle>
+                    <clipPath id="cut-off-bottom-mushroom3"><rect x="100" y="-10" width="470" height="100" /></clipPath>
+                    {/* spots on the hat */}
+                    <circle cx="390" cy="70" r="13" fill="white" stroke="none"></circle>
+                    <circle cx="430" cy="25" r="19" fill="white" stroke="none"></circle>
+                    <circle cx="475" cy="65" r="15" fill="white" stroke="none"></circle>
+                    <circle cx="522" cy="21" r="12" fill="white" stroke="none"></circle>
+                    <circle cx="548" cy="77" r="18" fill="white" stroke="none"></circle>
+                    {/* close the circle */}
+                    <circle cx="460" cy="100" r="100" clipPath="url(#cut-off-bottom-mushroom3)" fill="none" stroke="black" strokeWidth="3"></circle>
+                    <line x1="359.15" y1="90" x2="560.85" y2="90" stroke="black" strokeWidth="3"></line>
+                    {/* body */}
+                    <rect width="120" height="100" x="400" y="90" rx="2" ry="2" fill="none" stroke="black" strokeWidth="3"></rect>
+                    {/* eyes */}
+                    <line x1="445" y1="110" x2="445" y2="140" stroke="black" strokeWidth="4"></line>
+                    <line x1="475" y1="110" x2="475" y2="140" stroke="black" strokeWidth="4"></line>
+                    {/* mouth */}
+                    <circle cx="460" cy="145" r="30" clipPath="url(#cut-off-top-mushroom3)" fill="none" stroke="black" strokeWidth="3"></circle>
+                    <clipPath id="cut-off-top-mushroom3"><rect x="400" y="145" width="220" height="100" /></clipPath>
+                </svg>
         <Button
           block
           bsSize="large"
@@ -303,7 +370,7 @@ class PageSelector extends Component {
       year: 1960,
       "age-category": "50-74",
       relationship: "relative",
-      residence: "france",
+      country: "france",
       errors: {},
       ready: true,
       langage: "en"
@@ -344,7 +411,7 @@ class PageSelector extends Component {
     }
 
     if (error) {
-      this.setState(errorMessages)
+      this.setState({errors: errorMessages})
     }
     else {
       this.api(
@@ -366,9 +433,12 @@ class PageSelector extends Component {
       error = true
       errorMessages["name"] = "Please enter your name."
     }
+    else {
+      errorMessages["name"] = ""
+    }
 
     if (error) {
-      this.setState(errorMessages)
+      this.setState({errors: errorMessages})
     }
     else {
       this.api(
@@ -404,12 +474,11 @@ class PageSelector extends Component {
       },
       success: function(response) {
         console.log(response)
-        this.setState(response,)
+        this.setState(response)
         this.setState({ready:true})
-      },
-      error: function(error) {
-        console.log(error)
-        this.setState({ready:true})
+        if (typeof response.errorMessage === "undefined") {
+          this.setState({errorMessage: null})
+        }
       },
     })
   }
@@ -463,7 +532,7 @@ class PageSelector extends Component {
             year={this.state.year}
             hideBirthday={this.state.hideBirthday}
             ageCategory={this.state.ageCategory}
-            residence={this.state.residence}
+            country={this.state.country}
             relationship={this.state.relationship}
           />
         )
@@ -497,6 +566,7 @@ class PageSelector extends Component {
         lg={6} md={8} sm={10}
       >
         <Header/>
+        {this.state.errorMessage ? <Alert bsStyle="danger">{this.state.errorMessage}</Alert> : null}
         {currentPage}
         {showFlags ? <Flags/> : null}
       </Col>
