@@ -6,7 +6,10 @@ import './App.css';
 class Flags extends Component {
   render() {
     return (
-      <div>flags</div>
+      <div>
+        {!this.props.mainPage ? <hr/> : null}
+        flags
+      </div>
     )
   }
 }
@@ -14,7 +17,10 @@ class Flags extends Component {
 class Header extends Component {
   render() {
     return (
-      <div>header</div>
+      <div>
+        header
+        <hr/>
+      </div>
     )
   }
 }
@@ -413,9 +419,9 @@ class PageSelector extends Component {
     if (error) {
       this.setState({errors: errorMessages})
     }
+    // API call
     else {
       this.api(
-        "get",
         "login",
         {user: this.state.user, password: this.state.password}
       ) 
@@ -440,9 +446,9 @@ class PageSelector extends Component {
     if (error) {
       this.setState({errors: errorMessages})
     }
+    // API call
     else {
       this.api(
-        "get",
         "createUser",
         {}
       ) 
@@ -454,37 +460,63 @@ class PageSelector extends Component {
   fetchSurvey() {
 
   }
-  api(method,endpoint,data) {
-    console.log(method, endpoint, data)
-    var urlPath = "";
-    if (endpoint === "login") {
-      urlPath = "https://bu67qviz40.execute-api.us-west-2.amazonaws.com/prod"
+  // programatically generated API calls
+  api(request,data) {
+    // validates request
+    if (typeof data === 'object' && typeof request === "string") {
+        if (request.length && Object.keys(data).length) {
+        data["request"] = request
+        console.log("Request sent.","\nData: ",data)
+        this.setState({ready:false})
+        $.ajax({
+          url: "https://bu67qviz40.execute-api.us-west-2.amazonaws.com/prod",
+          data: data,
+          contentType: 'application/json',
+          dataType: 'json',
+          context: this,
+          header: {'Access-Control-Allow-Origin':'*'},
+          success: function(response) {
+            // saves response in the state
+            this.setState(response)
+            this.setState({ready:true})
+            // no error
+            if (typeof response.errorMessage === "undefined") {
+              this.setState({errorMessage: null})
+              console.log(
+                "Request succeeded.",
+                "\nOriginal request:", request,
+                "\nResponse:", response
+              )
+            }
+            // log request error details if any
+            else {
+              var errorDetails = "No details were provided."
+              if (typeof response.errorDetails !== "undefined") {
+                errorDetails = response.errorDetails
+              }
+              console.error(
+                "Request failed.",
+                "\nData sent:",data,
+                "\nError message:", JSON.stringify(response.errorMessage),
+                "\nError details:", errorDetails,
+              )
+            }
+          },
+        })
+      }
+      else {
+        console.error("Request could not be sent: The arguments passed to the API are invalid. Data or request can not be empty.")
+        this.setState({errorMessage: "Sorry, an error occurred."})
+      }
     }
-
-    this.setState({ready:false})
-    $.ajax({
-      type: method,
-      url: urlPath,
-      data: data,
-      contentType: 'application/json',
-      dataType: 'json',
-      context: this,
-      header: {
-        'Access-Control-Allow-Origin':'*',
-      },
-      success: function(response) {
-        console.log(response)
-        this.setState(response)
-        this.setState({ready:true})
-        if (typeof response.errorMessage === "undefined") {
-          this.setState({errorMessage: null})
-        }
-      },
-    })
+    else {
+      console.error("Request could not be sent: The arguments passed to the API are invalid. Data must be a flat object and request must be a string.")
+      this.setState({errorMessage: "Sorry, an error occurred."})
+    }
   }
   storeData(input) {
     let state = this.state
-    console.log(input.target)
+    // console.log(input.target)
     if (input.target.type === "checkbox") {
       state[input.target.name] = input.target.checked
     }
