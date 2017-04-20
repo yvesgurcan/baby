@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
-import {Button, FormControl, FormGroup, Col, Alert, Grid, Row, Checkbox} from 'react-bootstrap'
+import {Button, FormControl, Col, Alert, Row, Checkbox} from 'react-bootstrap'
+import $ from 'jquery'
 import './App.css';
 
 class Flags extends Component {
@@ -286,22 +287,13 @@ class Login extends Component {
     )
   }
 }
-
-function mockAPI(method,endpoint,data) {
-  if (endpoint === "login") {
-    return {authorized: true, currentPage: "announcement"}
-  }
-  if (endpoint === "createUser") {
-    return {userCreated: true, currentPage: "questions"}
-  }
-}
  
 class PageSelector extends Component {
   constructor (props) {
     super(props)
     // state
     this.state = {
-      currentPage: "createProfile",
+      currentPage: "login",
       user: "",
       password: "",
       gender: "F",
@@ -309,10 +301,12 @@ class PageSelector extends Component {
       day: 1,
       month: 1,
       year: 1960,
-      ["age-category"]: "50-74",
+      "age-category": "50-74",
       relationship: "relative",
       residence: "france",
       errors: {},
+      ready: true,
+      langage: "en"
     }
     // functions
     this.storeData = this.storeData.bind(this)
@@ -332,7 +326,7 @@ class PageSelector extends Component {
       error = true
       errorMessages["user"] = "Please enter your email address."
     }
-    else if (!/^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/.test(this.state.user)) {
+    else if (!/^([a-zA-Z0-9_.-])+@(([a-zA-Z0-9-])+.)+([a-zA-Z0-9]{2,4})+$/.test(this.state.user)) {
       error = true
       errorMessages["user"] = "Please enter a valid email address."      
     }
@@ -392,9 +386,32 @@ class PageSelector extends Component {
   }
   api(method,endpoint,data) {
     console.log(method, endpoint, data)
-    let response = mockAPI(method,endpoint,data)
-    console.log(response)
-    this.setState(response)
+    var urlPath = "";
+    if (endpoint === "login") {
+      urlPath = "https://bu67qviz40.execute-api.us-west-2.amazonaws.com/prod"
+    }
+
+    this.setState({ready:false})
+    $.ajax({
+      type: method,
+      url: urlPath,
+      data: data,
+      contentType: 'application/json',
+      dataType: 'json',
+      context: this,
+      header: {
+        'Access-Control-Allow-Origin':'*',
+      },
+      success: function(response) {
+        console.log(response)
+        this.setState(response,)
+        this.setState({ready:true})
+      },
+      error: function(error) {
+        console.log(error)
+        this.setState({ready:true})
+      },
+    })
   }
   storeData(input) {
     let state = this.state
@@ -465,6 +482,15 @@ class PageSelector extends Component {
         )
         break
     }
+
+    if (!this.state.ready) {
+      currentPage = (
+        <div className="text-center">
+          <i className="fa fa-spinner fa-spin" style={{fontSize: "50px"}}></i>
+        </div>
+      )
+    }
+
     return (
       <Col
         lgOffset={3} mdOffset={2} smOffset={1}
