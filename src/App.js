@@ -66,7 +66,7 @@ class CreateProfile extends Component {
     return years
   }
   ageCategories() {
-    const categories = [{id:"24+",name:"24 -"},{id:"25-49",name:"25-49"},{id:"50-74",name:"50-74"},{id:"75+",name:"75+"}]
+    const categories = [{id:"24-",name:"24-"},{id:"25-49",name:"25-49"},{id:"50-74",name:"50-74"},{id:"75+",name:"75+"}]
     let ageCategories = categories.map((category) => {
       return <option key={category.id} value={category.id}>{category.name}</option>
     })
@@ -168,7 +168,7 @@ class CreateProfile extends Component {
           </Col>
           :
           <Col sm={11}>
-            <Col smOffset={3} sm={4}>
+            <Col smOffset={4} sm={4}>
               <FormControl
                 name="age-category"
                 value={this.props["age-category"]}
@@ -187,7 +187,7 @@ class CreateProfile extends Component {
             <Col>
               <Checkbox
                 name="hideBirthday"
-                value={this.props.hideBirthday}
+                checked={this.props.hideBirthday}
                 bsSize="large"
                 className="margin-bottom"
                 onChange={this.props.storeData}
@@ -320,18 +320,18 @@ class Login extends Component {
           lg={8} md={6} sm={8} xs={10}
           >
           <FormControl
-            name="user"
+            name="email"
             type="email"
             bsSize="large"
             className="margin-bottom"
             onChange={this.props.storeData}
           />
           {
-            !this.props.errors.user ?
+            !this.props.errors.email ?
             null :
             <Alert
             bsStyle="danger">
-            {this.props.errors.user}
+            {this.props.errors.email}
             </Alert>
           }
           <FormControl
@@ -367,7 +367,7 @@ class PageSelector extends Component {
     // state
     this.state = {
       currentPage: "login",
-      user: "",
+      email: "",
       password: "",
       gender: "F",
       name: "",
@@ -379,7 +379,8 @@ class PageSelector extends Component {
       country: "france",
       errors: {},
       ready: true,
-      langage: "en"
+      langage: "en",
+      hideBirthday: false,
     }
     // functions
     this.storeData = this.storeData.bind(this)
@@ -395,16 +396,16 @@ class PageSelector extends Component {
     let errorMessages = this.state.errors
     
     // validates user's email
-    if (this.state.user.length === 0) {
+    if (this.state.email.length === 0) {
       error = true
-      errorMessages["user"] = "Please enter your email address."
+      errorMessages["email"] = "Please enter your email address."
     }
-    else if (!/^([a-zA-Z0-9_.-])+@(([a-zA-Z0-9-])+.)+([a-zA-Z0-9]{2,4})+$/.test(this.state.user)) {
+    else if (!/^[\w._-]+[+]?[\w._-]+@[\w.-]+\.[a-zA-Z]{2,6}$/.test(this.state.email)) {
       error = true
-      errorMessages["user"] = "Please enter a valid email address."      
+      errorMessages["email"] = "Please enter a valid email address."      
     }
     else {
-      errorMessages["user"] = ""
+      errorMessages["email"] = ""
     }
 
     // validates password
@@ -423,18 +424,23 @@ class PageSelector extends Component {
     else {
       this.api(
         "login",
-        {user: this.state.user, password: this.state.password}
+        {email: this.state.email, password: this.state.password}
       ) 
     }
   }
   goToNewProfilePage() {
+    this.api(
+      "goToCreateProfile",
+      {email: this.state.email},
+      false
+    )
     this.setState({currentPage: "createProfile"})
   }
   submitProfile() {
     let error = false
     let errorMessages = this.state.errors
 
-    // validates user's email
+    // validates user's name
     if (this.state.name.length === 0) {
       error = true
       errorMessages["name"] = "Please enter your name."
@@ -448,9 +454,23 @@ class PageSelector extends Component {
     }
     // API call
     else {
+      var birthday = this.state.year + "/" + this.state.month + "/" + this.state.day
+      var ageCategory = "null"
+      if (this.state.hideBirthday) {
+        birthday = "null"
+        ageCategory = this.state["age-category"]
+      }
       this.api(
         "createUser",
-        {}
+        {
+          email: this.state.email,
+          gender: this.state.gender,
+          name: this.state.name,
+          birthday: birthday,
+          "age-category": ageCategory,
+          country: this.state.country,
+          relationship: this.state.relationship,
+        }
       ) 
     }
   }
@@ -461,13 +481,15 @@ class PageSelector extends Component {
 
   }
   // programatically generated API calls
-  api(request,data) {
+  api(request,data,spinner = true) {
     // validates request
     if (typeof data === 'object' && typeof request === "string") {
-        if (request.length && Object.keys(data).length) {
+        if (request.length && typeof data === "object") {
         data["request"] = request
         console.log("Request sent.","\nData: ",data)
-        this.setState({ready:false})
+        if (spinner) {
+          this.setState({ready:false})
+        }
         $.ajax({
           url: "https://bu67qviz40.execute-api.us-west-2.amazonaws.com/prod",
           data: data,
@@ -476,32 +498,50 @@ class PageSelector extends Component {
           context: this,
           header: {'Access-Control-Allow-Origin':'*'},
           success: function(response) {
-            // saves response in the state
-            this.setState(response)
             this.setState({ready:true})
-            // no error
-            if (typeof response.errorMessage === "undefined") {
-              this.setState({errorMessage: null})
-              console.log(
-                "Request succeeded.",
-                "\nOriginal request:", request,
-                "\nResponse:", response
-              )
-            }
-            // log request error details if any
-            else {
-              var errorDetails = "No details were provided."
-              if (typeof response.errorDetails !== "undefined") {
-                errorDetails = response.errorDetails
+            if (response != null && typeof response === "object") {
+              // saves response in the state
+              this.setState(response)
+              // toggles hide birthday checkbox
+              if (typeof response["age-category"] !== "undefined" && response["age-category"] !== "null") {
+                this.setState({hideBirthday: true})
               }
-              console.error(
-                "Request failed.",
-                "\nData sent:",data,
-                "\nError message:", JSON.stringify(response.errorMessage),
-                "\nError details:", errorDetails,
+              // parses birthday into year, month, and day
+              else if (typeof response["birthday"] !== "undefined" && response["birthday"] !== "null") {
+                // TODO
+              }
+              // no error
+              if (typeof response.errorMessage === "undefined") {
+                this.setState({errorMessage: null})
+                console.log(
+                  "Request succeeded.",
+                  "\nOriginal request:", request,
+                  "\nResponse:", response
+                )
+              }
+              // log request error (error details if any)
+              else {
+                var errorDetails = "No details were provided."
+                if (typeof response.errorDetails !== "undefined") {
+                  errorDetails = response.errorDetails
+                }
+                console.error(
+                  "Request failed.",
+                  "\nData sent:",data,
+                  "\nError message:", JSON.stringify(response.errorMessage),
+                  "\nError details:", errorDetails,
+                )
+              }
+            }
+            // response is not an object
+            else {
+              console.warn(
+                "Request did not return an object.",
+                "\nOriginal request:", request,
+                "\nResponse:",response,
               )
             }
-          },
+          }
         })
       }
       else {
@@ -558,14 +598,15 @@ class PageSelector extends Component {
             submitProfile={this.submitProfile}
             errors={this.state.errors}
             name={this.state.name}
-            email={this.state.user}
+            email={this.state.email}
             day={this.state.day}
             month={this.state.month}
             year={this.state.year}
             hideBirthday={this.state.hideBirthday}
-            ageCategory={this.state.ageCategory}
+            age-category={this.state["age-category"]}
             country={this.state.country}
             relationship={this.state.relationship}
+            gender={this.state.gender}
           />
         )
         break
