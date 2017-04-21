@@ -34,9 +34,79 @@ class ShowSurvey extends Component {
 }
 
 class Questions extends Component {
+  componentDidMount() {
+    this.props.api(
+      "names",
+      {email: this.props.email},
+      false
+    )
+  }
   render() {
     return (
-      <div>questions</div>
+      <div>
+        <hr/>
+        <Col sm={12}>
+          <Col sm={4}>
+            <FormControl
+              name="babyName1"
+              value={this.props.babyName1}
+              bsSize="large"
+              className="margin-bottom"
+              onChange={this.props.storeData}
+            />
+            {
+              !this.props.errors.babyName1 ?
+              null :
+              <Alert
+              bsStyle="danger">
+              {this.props.errors.babyName1}
+              </Alert>
+            }
+          </Col>
+          <Col sm={4}>
+            <FormControl
+              name="babyName2"
+              value={this.props.babyName2}
+              bsSize="large"
+              className="margin-bottom"
+              onChange={this.props.storeData}
+            />
+            {
+              !this.props.errors.babyName2 ?
+              null :
+              <Alert
+              bsStyle="danger">
+              {this.props.errors.babyName2}
+              </Alert>
+            }
+          </Col>
+          <Col sm={4}>
+            <FormControl
+              name="babyName3"
+              value={this.props.babyName3}
+              bsSize="large"
+              className="margin-bottom"
+              onChange={this.props.storeData}
+            />
+            {
+              !this.props.errors.babyName3 ?
+              null :
+              <Alert
+              bsStyle="danger">
+              {this.props.errors.babyName3}
+              </Alert>
+            }
+          </Col>
+          <Col sm={12}>
+            <Button
+              block
+              bsSize="large"
+              bsStyle="primary"
+              onClick={this.props.submitNames}
+            >Submit Names</Button>
+          </Col>
+        </Col>
+      </div>
     )
   }
 }
@@ -218,12 +288,15 @@ class CreateProfile extends Component {
             {this.relationships()}
           </FormControl>
         </Col>
-        <Button
-          block
-          bsSize="large"
-          bsStyle="primary"
-          onClick={this.props.submitProfile}
-        >Create Profile</Button>
+
+        <Col sm={12}>
+          <Button
+            block
+            bsSize="large"
+            bsStyle="primary"
+            onClick={this.props.submitProfile}
+          >Create Profile</Button>
+        </Col>
       </div>
     )
   }
@@ -232,7 +305,7 @@ class CreateProfile extends Component {
 class Announcement extends Component {
   render() {
     return (
-      <Col xs={12}>
+      <Col sm={12}>
                 <svg viewBox="0 -10 570 210">
                     {/* mushroom 1 */}
                     {/* hat */}
@@ -381,6 +454,9 @@ class PageSelector extends Component {
       ready: true,
       langage: "en",
       hideBirthday: false,
+      babyName1: "",
+      babyName2: "",
+      babyName3: "",
     }
     // functions
     this.storeData = this.storeData.bind(this)
@@ -388,6 +464,7 @@ class PageSelector extends Component {
     this.goToNewProfilePage = this.goToNewProfilePage.bind(this)
     this.submitProfile = this.submitProfile.bind(this)
     this.submitAnswers = this.submitAnswers.bind(this)
+    this.submitNames = this.submitNames.bind(this)
     this.fetchSurvey = this.fetchSurvey.bind(this)
     this.api = this.api.bind(this)
   }
@@ -476,6 +553,41 @@ class PageSelector extends Component {
   }
   submitAnswers() {
 
+  }
+  submitNames() {
+    // handle vote for existing names
+    // TODO
+
+    // handle new names
+    let error = false
+    let errorMessages = this.state.errors
+    if (!/[-A-Za-z]/.test(this.state.babyName1) && this.state.babyName1 !== "") {
+      errorMessages["babyName1"] = "Please enter a valid name."
+      error = true
+    }
+    if (!/[-A-Za-z]/.test(this.state.babyName2) && this.state.babyName2 !== "") {
+      errorMessages["babyName2"] = "Please enter a valid name."
+      error = true
+    }
+    if (!/[-A-Za-z]/.test(this.state.babyName3) && this.state.babyName3 !== "") {
+      errorMessages["babyName3"] = "Please enter a valid name."
+      error = true
+    }
+    if (error) {
+      this.setState({errors: errorMessages})
+    }
+    else {
+      this.api(
+        "submitNewNames",
+        {
+          babyName1: this.state.babyName1,
+          babyName2: this.state.babyName2,
+          babyName3: this.state.babyName3,
+        }
+        ,
+        false
+      )
+    }
   }
   fetchSurvey() {
 
@@ -614,6 +726,14 @@ class PageSelector extends Component {
         currentPage = (
           <Questions
             storeData={this.storeData}
+            names={this.items}
+            email={this.state.email}
+            api={this.api}
+            babyName1={this.state.babyName1}
+            babyName2={this.state.babyName2}
+            babyName3={this.state.babyName3}
+            errors={this.state.errors}
+            submitNames={this.submitNames}
           />
         )
         break
