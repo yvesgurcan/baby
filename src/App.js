@@ -1,14 +1,203 @@
 import React, {Component} from 'react';
-import {Button, FormControl, Col, Alert, Row, Checkbox} from 'react-bootstrap'
+import {Button, FormControl, Col, PageHeader, Clearfix, Alert, Row, Checkbox} from 'react-bootstrap'
 import $ from 'jquery'
 import './App.css';
 
-class Flags extends Component {
+class FrenchFlag extends Component {
   render() {
     return (
+                        <svg width={this.props.mainPage ? "200" : "50"} height={this.props.mainPage ? "100" : "25"}  viewBox="0 0 45 26">
+                            <rect width="14" height="26"  x="1" fill="darkblue"></rect>
+                            <rect width="14" height="26"  x="15" fill="white"></rect>
+                            <rect width="14" height="26"  x="29" fill="red"></rect>
+                            <rect width="42" height="26"  x="1" fill="transparent" stroke="darkgray"></rect>
+                        </svg>
+    )
+  }
+}
+
+class AmericanFlag extends Component {
+  render() {
+    return (
+                        <svg width={this.props.mainPage ? "200" : "50"} height={this.props.mainPage ? "100" : "25"} viewBox="0 0 43 26">
+                            <rect width="42" height="2"  fill="crimson"></rect>
+                            <rect width="42" height="2"  y="4" fill="crimson"></rect>
+                            <rect width="42" height="2"  y="8" fill="crimson"></rect>
+                            <rect width="42" height="2"  y="12" fill="crimson"></rect>
+                            <rect width="42" height="2"  y="16" fill="crimson"></rect>
+                            <rect width="42" height="2"  y="20" fill="crimson"></rect>
+                            <rect width="42" height="2"  y="24" fill="crimson"></rect>
+                            <rect width="14" height="14" fill="darkblue"></rect>
+                            <rect width="42" height="26" fill="transparent" stroke="darkgray"></rect>
+                            <rect width="1" height="1" x="0.75" y="0.75" fill="white"></rect>
+                            <rect width="1" height="1" x="2.75" y="0.75" fill="white"></rect>
+                            <rect width="1" height="1" x="4.75" y="0.75" fill="white"></rect>
+                            <rect width="1" height="1" x="6.75" y="0.75" fill="white"></rect>
+                            <rect width="1" height="1" x="8.75" y="0.75" fill="white"></rect>
+                            <rect width="1" height="1" x="10.75" y="0.75" fill="white"></rect>
+                            <rect width="1" height="1" x="12.75" y="0.75" fill="white"></rect>
+                            <rect width="1" height="1" x="0.75" y="2.75" fill="white"></rect>
+                            <rect width="1" height="1" x="2.75" y="2.75" fill="white"></rect>
+                            <rect width="1" height="1" x="4.75" y="2.75" fill="white"></rect>
+                            <rect width="1" height="1" x="6.75" y="2.75" fill="white"></rect>
+                            <rect width="1" height="1" x="8.75" y="2.75" fill="white"></rect>
+                            <rect width="1" height="1" x="10.75" y="2.75" fill="white"></rect>
+                            <rect width="1" height="1" x="12.75" y="2.75" fill="white"></rect>
+                            <rect width="1" height="1" x="0.75" y="4.75" fill="white"></rect>
+                            <rect width="1" height="1" x="2.75" y="4.75" fill="white"></rect>
+                            <rect width="1" height="1" x="4.75" y="4.75" fill="white"></rect>
+                            <rect width="1" height="1" x="6.75" y="4.75" fill="white"></rect>
+                            <rect width="1" height="1" x="8.75" y="4.75" fill="white"></rect>
+                            <rect width="1" height="1" x="10.75" y="4.75" fill="white"></rect>
+                            <rect width="1" height="1" x="12.75" y="4.75" fill="white"></rect>
+                            <rect width="1" height="1" x="0.75" y="6.75" fill="white"></rect>
+                            <rect width="1" height="1" x="2.75" y="6.75" fill="white"></rect>
+                            <rect width="1" height="1" x="4.75" y="6.75" fill="white"></rect>
+                            <rect width="1" height="1" x="6.75" y="6.75" fill="white"></rect>
+                            <rect width="1" height="1" x="8.75" y="6.75" fill="white"></rect>
+                            <rect width="1" height="1" x="10.75" y="6.75" fill="white"></rect>
+                            <rect width="1" height="1" x="12.75" y="6.75" fill="white"></rect>
+                            <rect width="1" height="1" x="0.75" y="8.75" fill="white"></rect>
+                            <rect width="1" height="1" x="2.75" y="8.75" fill="white"></rect>
+                            <rect width="1" height="1" x="4.75" y="8.75" fill="white"></rect>
+                            <rect width="1" height="1" x="6.75" y="8.75" fill="white"></rect>
+                            <rect width="1" height="1" x="8.75" y="8.75" fill="white"></rect>
+                            <rect width="1" height="1" x="10.75" y="8.75" fill="white"></rect>
+                            <rect width="1" height="1" x="12.75" y="8.75" fill="white"></rect>
+                            <rect width="1" height="1" x="0.75" y="10.75" fill="white"></rect>
+                            <rect width="1" height="1" x="2.75" y="10.75" fill="white"></rect>
+                            <rect width="1" height="1" x="4.75" y="10.75" fill="white"></rect>
+                            <rect width="1" height="1" x="6.75" y="10.75" fill="white"></rect>
+                            <rect width="1" height="1" x="8.75" y="10.75" fill="white"></rect>
+                            <rect width="1" height="1" x="10.75" y="10.75" fill="white"></rect>
+                            <rect width="1" height="1" x="12.75" y="10.75" fill="white"></rect>
+                            <rect width="1" height="1" x="0.75" y="12.75" fill="white"></rect>
+                            <rect width="1" height="1" x="2.75" y="12.75" fill="white"></rect>
+                            <rect width="1" height="1" x="4.75" y="12.75" fill="white"></rect>
+                            <rect width="1" height="1" x="6.75" y="12.75" fill="white"></rect>
+                            <rect width="1" height="1" x="8.75" y="12.75" fill="white"></rect>
+                            <rect width="1" height="1" x="10.75" y="12.75" fill="white"></rect>
+                            <rect width="1" height="1" x="12.75" y="12.75" fill="white"></rect>
+                        </svg>
+    )
+  }
+}
+
+class RedMushroom extends Component {
+  render() {
+    return (
+                  <svg viewBox="0 -10 570 220">
+                    {/* mushroom 1 */}
+                    {/* hat */}
+                    <circle cx="110" cy="100" r="100" clipPath="url(#cut-off-bottom-mushroom1)" fill="red" stroke="black" strokeWidth="3"></circle>
+                    <clipPath id="cut-off-bottom-mushroom1"><rect x="0" y="-10" width="220" height="100" /></clipPath>
+                    {/* spots on the hat */}
+                    <circle cx="30" cy="35" r="18" fill="white" stroke="none"></circle>
+                    <circle cx="75" cy="65" r="15" fill="white" stroke="none"></circle>
+                    <circle cx="122" cy="21" r="12" fill="white" stroke="none"></circle>
+                    <circle cx="145" cy="75" r="18" fill="white" stroke="none"></circle>
+                    <circle cx="190" cy="50" r="13" fill="white" stroke="none"></circle>
+                    {/* close the circle */}
+                    <circle cx="110" cy="100" r="100" clipPath="url(#cut-off-bottom-mushroom1)" fill="none" stroke="black" strokeWidth="3"></circle>
+                    <line x1="9.15" y1="90" x2="210.85" y2="90" stroke="black" strokeWidth="3"></line>
+                    {/* body */}
+                    <rect width="120" height="100" x="50" y="90" rx="2" ry="2" fill="none" stroke="black" strokeWidth="3"></rect>
+                    {/* eyes */}
+                    <line x1="95" y1="110" x2="95" y2="140" stroke="black" strokeWidth="4"></line>
+                    <line x1="125" y1="110" x2="125" y2="140" stroke="black" strokeWidth="4"></line>
+                    {/* mouth */}
+                    <circle cx="110" cy="145" r="30" clipPath="url(#cut-off-top-mushroom1)" fill="none" stroke="black" strokeWidth="3"></circle>
+                    <clipPath id="cut-off-top-mushroom1"><rect x="0" y="145" width="220" height="100" /></clipPath>
+                  </svg>
+    )
+  }
+}
+
+class GreenMushroom extends Component {
+  render() {
+    return (
+                  <svg height={this.props.header ? "60" : null} width={this.props.header ? "60" : null} viewBox={this.props.header ? "215 80 140 160" : "0 0 570 220"}>
+                    {/* mushroom 2 */}
+                    {/* hat */}
+                    <circle cx="285" cy="150" r="65" clipPath="url(#cut-off-bottom-mushroom2)" fill="lightgreen" stroke="black" strokeWidth="3"></circle>
+                    <clipPath id="cut-off-bottom-mushroom2"><rect x="110" y="" width="245" height="145" /></clipPath>
+                    {/* spots on the hat */}
+                    <circle cx="230" cy="125" r="11" fill="white" stroke="none"></circle>
+                    <circle cx="265" cy="140" r="7" fill="white" stroke="none"></circle>
+                    <circle cx="295" cy="105" r="12" fill="white" stroke="none"></circle>
+                    <circle cx="326" cy="126" r="9" fill="white" stroke="none"></circle>
+                    {/* close the circle */}
+                    <circle cx="285" cy="150" r="65" clipPath="url(#cut-off-bottom-mushroom2)" fill="none" stroke="black" strokeWidth="3"></circle>
+                    <line x1="219.15" y1="145" x2="350.85" y2="145" stroke="black" strokeWidth="3"></line>
+                    {/* body */}
+                    <rect width="70" height="50" x="250" y="145" rx="2" ry="2" fill="none" stroke="black" strokeWidth="3"></rect>
+                    {/* eyes */}
+                    <line x1="263" y1="165" x2="273" y2="155" stroke="black" strokeWidth="4"></line>
+                    <line x1="271" y1="155" x2="281" y2="165" stroke="black" strokeWidth="4"></line>
+                    <line x1="288" y1="165" x2="298" y2="155" stroke="black" strokeWidth="4"></line>
+                    <line x1="296" y1="155" x2="306" y2="165" stroke="black" strokeWidth="4"></line>
+                    {/* mouth */}
+                    <line x1="276" y1="175" x2="286" y2="185" stroke="black" strokeWidth="4"></line>
+                    <line x1="284" y1="185" x2="294" y2="175" stroke="black" strokeWidth="4"></line>
+                  </svg>
+    )
+  }
+}
+
+class OrangeMushroom extends Component {
+  render() {
+    return (
+                  <svg viewBox="0 -10 570 220">
+                    {/* mushroom 3 */}
+                    {/* hat */}
+                    <circle cx="460" cy="100" r="100" clipPath="url(#cut-off-bottom-mushroom3)" fill="orange" stroke="black" strokeWidth="3"></circle>
+                    <clipPath id="cut-off-bottom-mushroom3"><rect x="100" y="-10" width="470" height="100" /></clipPath>
+                    {/* spots on the hat */}
+                    <circle cx="390" cy="70" r="13" fill="white" stroke="none"></circle>
+                    <circle cx="430" cy="25" r="19" fill="white" stroke="none"></circle>
+                    <circle cx="475" cy="65" r="15" fill="white" stroke="none"></circle>
+                    <circle cx="522" cy="21" r="12" fill="white" stroke="none"></circle>
+                    <circle cx="548" cy="77" r="18" fill="white" stroke="none"></circle>
+                    {/* close the circle */}
+                    <circle cx="460" cy="100" r="100" clipPath="url(#cut-off-bottom-mushroom3)" fill="none" stroke="black" strokeWidth="3"></circle>
+                    <line x1="359.15" y1="90" x2="560.85" y2="90" stroke="black" strokeWidth="3"></line>
+                    {/* body */}
+                    <rect width="120" height="100" x="400" y="90" rx="2" ry="2" fill="none" stroke="black" strokeWidth="3"></rect>
+                    {/* eyes */}
+                    <line x1="445" y1="110" x2="445" y2="140" stroke="black" strokeWidth="4"></line>
+                    <line x1="475" y1="110" x2="475" y2="140" stroke="black" strokeWidth="4"></line>
+                    {/* mouth */}
+                    <circle cx="460" cy="145" r="30" clipPath="url(#cut-off-top-mushroom3)" fill="none" stroke="black" strokeWidth="3"></circle>
+                    <clipPath id="cut-off-top-mushroom3"><rect x="400" y="145" width="220" height="100" /></clipPath>
+                  </svg>
+    )
+  }
+}
+
+class Flags extends Component {
+  constructor (props) {
+    super(props)
+    // functions
+    this.messages = this.messages.bind(this)
+  }
+  messages() {
+    return {
+      fr: {title: "Choisissez une langue"},
+      en: {title: "Choose your language"}
+    }
+  }
+  render() {
+    let messages = this.messages()[this.props.language]
+    return (
       <div>
-        {!this.props.mainPage ? <hr/> : null}
-        flags
+        <Clearfix/>
+          {!this.props.mainPage ? <hr/> : null}
+          <div className="text-center">
+            {this.props.mainPage ? <PageHeader>{messages.title}</PageHeader> : null}
+            <Clearfix/>
+            <AmericanFlag mainPage={this.props.mainPage} />
+            <FrenchFlag mainPage={this.props.mainPage}/>
+        </div>
       </div>
     )
   }
@@ -18,8 +207,17 @@ class Header extends Component {
   render() {
     return (
       <div>
-        header
-        <hr/>
+        <Col xs={2} style={{marginTop: "5px"}} >
+            {this.props.currentPage !== "announcement" ? <GreenMushroom header/> : null}
+        </Col>
+        <Col xs={8} style={{marginTop: "10px"}} className="text-center">
+          <div className="override-default"><PageHeader>{this.props.headerMessage}</PageHeader></div>
+        </Col>
+        <Col xs={2}  style={{marginTop: "22.5px"}} className="text-right">
+          <a className="logout" hidden={!this.props.authenticated} onClick={this.props.logout}>Logout</a>
+        </Col>
+        <Clearfix/>
+        <hr className="header"/>
       </div>
     )
   }
@@ -306,74 +504,11 @@ class Announcement extends Component {
   render() {
     return (
       <Col sm={12}>
-                <svg viewBox="0 -10 570 210">
-                    {/* mushroom 1 */}
-                    {/* hat */}
-                    <circle cx="110" cy="100" r="100" clipPath="url(#cut-off-bottom-mushroom1)" fill="red" stroke="black" strokeWidth="3"></circle>
-                    <clipPath id="cut-off-bottom-mushroom1"><rect x="0" y="-10" width="220" height="100" /></clipPath>
-                    {/* spots on the hat */}
-                    <circle cx="30" cy="35" r="18" fill="white" stroke="none"></circle>
-                    <circle cx="75" cy="65" r="15" fill="white" stroke="none"></circle>
-                    <circle cx="122" cy="21" r="12" fill="white" stroke="none"></circle>
-                    <circle cx="145" cy="75" r="18" fill="white" stroke="none"></circle>
-                    <circle cx="190" cy="50" r="13" fill="white" stroke="none"></circle>
-                    {/* close the circle */}
-                    <circle cx="110" cy="100" r="100" clipPath="url(#cut-off-bottom-mushroom1)" fill="none" stroke="black" strokeWidth="3"></circle>
-                    <line x1="9.15" y1="90" x2="210.85" y2="90" stroke="black" strokeWidth="3"></line>
-                    {/* body */}
-                    <rect width="120" height="100" x="50" y="90" rx="2" ry="2" fill="none" stroke="black" strokeWidth="3"></rect>
-                    {/* eyes */}
-                    <line x1="95" y1="110" x2="95" y2="140" stroke="black" strokeWidth="4"></line>
-                    <line x1="125" y1="110" x2="125" y2="140" stroke="black" strokeWidth="4"></line>
-                    {/* mouth */}
-                    <circle cx="110" cy="145" r="30" clipPath="url(#cut-off-top-mushroom1)" fill="none" stroke="black" strokeWidth="3"></circle>
-                    <clipPath id="cut-off-top-mushroom1"><rect x="0" y="145" width="220" height="100" /></clipPath>
-
-                    {/* mushroom 2 */}
-                    {/* hat */}
-                    <circle cx="285" cy="150" r="65" clipPath="url(#cut-off-bottom-mushroom2)" fill="lightgreen" stroke="black" strokeWidth="3"></circle>
-                    <clipPath id="cut-off-bottom-mushroom2"><rect x="110" y="" width="245" height="145" /></clipPath>
-                    {/* spots on the hat */}
-                    <circle cx="230" cy="125" r="11" fill="white" stroke="none"></circle>
-                    <circle cx="265" cy="140" r="7" fill="white" stroke="none"></circle>
-                    <circle cx="295" cy="105" r="12" fill="white" stroke="none"></circle>
-                    <circle cx="326" cy="126" r="9" fill="white" stroke="none"></circle>
-                    {/* close the circle */}
-                    <circle cx="285" cy="150" r="65" clipPath="url(#cut-off-bottom-mushroom2)" fill="none" stroke="black" strokeWidth="3"></circle>
-                    <line x1="219.15" y1="145" x2="350.85" y2="145" stroke="black" strokeWidth="3"></line>
-                    {/* body */}
-                    <rect width="70" height="50" x="250" y="145" rx="2" ry="2" fill="none" stroke="black" strokeWidth="3"></rect>
-                    {/* eyes */}
-                    <line x1="263" y1="165" x2="273" y2="155" stroke="black" strokeWidth="4"></line>
-                    <line x1="271" y1="155" x2="281" y2="165" stroke="black" strokeWidth="4"></line>
-                    <line x1="288" y1="165" x2="298" y2="155" stroke="black" strokeWidth="4"></line>
-                    <line x1="296" y1="155" x2="306" y2="165" stroke="black" strokeWidth="4"></line>
-                    {/* mouth */}
-                    <line x1="276" y1="175" x2="286" y2="185" stroke="black" strokeWidth="4"></line>
-                    <line x1="284" y1="185" x2="294" y2="175" stroke="black" strokeWidth="4"></line>
-                    
-                    {/* mushroom 3 */}
-                    {/* hat */}
-                    <circle cx="460" cy="100" r="100" clipPath="url(#cut-off-bottom-mushroom3)" fill="orange" stroke="black" strokeWidth="3"></circle>
-                    <clipPath id="cut-off-bottom-mushroom3"><rect x="100" y="-10" width="470" height="100" /></clipPath>
-                    {/* spots on the hat */}
-                    <circle cx="390" cy="70" r="13" fill="white" stroke="none"></circle>
-                    <circle cx="430" cy="25" r="19" fill="white" stroke="none"></circle>
-                    <circle cx="475" cy="65" r="15" fill="white" stroke="none"></circle>
-                    <circle cx="522" cy="21" r="12" fill="white" stroke="none"></circle>
-                    <circle cx="548" cy="77" r="18" fill="white" stroke="none"></circle>
-                    {/* close the circle */}
-                    <circle cx="460" cy="100" r="100" clipPath="url(#cut-off-bottom-mushroom3)" fill="none" stroke="black" strokeWidth="3"></circle>
-                    <line x1="359.15" y1="90" x2="560.85" y2="90" stroke="black" strokeWidth="3"></line>
-                    {/* body */}
-                    <rect width="120" height="100" x="400" y="90" rx="2" ry="2" fill="none" stroke="black" strokeWidth="3"></rect>
-                    {/* eyes */}
-                    <line x1="445" y1="110" x2="445" y2="140" stroke="black" strokeWidth="4"></line>
-                    <line x1="475" y1="110" x2="475" y2="140" stroke="black" strokeWidth="4"></line>
-                    {/* mouth */}
-                    <circle cx="460" cy="145" r="30" clipPath="url(#cut-off-top-mushroom3)" fill="none" stroke="black" strokeWidth="3"></circle>
-                    <clipPath id="cut-off-top-mushroom3"><rect x="400" y="145" width="220" height="100" /></clipPath>
-                </svg>
+        <svg viewBox="0 -10 570 220">
+          <RedMushroom/>
+          <GreenMushroom/>
+          <OrangeMushroom/>
+        </svg>
         <Button
           block
           bsSize="large"
@@ -395,6 +530,7 @@ class Login extends Component {
           <FormControl
             name="email"
             type="email"
+            value={this.props.email}
             bsSize="large"
             className="margin-bottom"
             onChange={this.props.storeData}
@@ -427,7 +563,7 @@ class Login extends Component {
             bsStyle="primary"
             bsSize="large"
             className="margin-bottom"
-            onClick={this.props.submitLogin}
+            onClick={this.props.login}
           >Enter</Button>
         </Col>
     )
@@ -437,13 +573,28 @@ class Login extends Component {
 class PageSelector extends Component {
   constructor (props) {
     super(props)
+    // get preselected language and email from URL
+    let pathname = window.location.pathname
+    let urlFragments = pathname.split("/")
+    let language = urlFragments.filter(urlFragment => {
+      return urlFragment === "en" || urlFragment === "fr"
+    })[0]
+    let email = urlFragments.filter(urlFragment => {
+      return /^[\w._-]+[+]?[\w._-]+@[\w.-]+\.[a-zA-Z]{2,6}$/.test(urlFragment)
+    })[0]
+    let name = decodeURI(urlFragments.filter(urlFragment => {
+      console.log(urlFragment,urlFragment !== "en" && urlFragment !== "fr" && !/^[\w._-]+[+]?[\w._-]+@[\w.-]+\.[a-zA-Z]{2,6}$/.test(urlFragment))
+      return urlFragment !== "" && urlFragment !== "en" && urlFragment !== "fr" && !/^[\w._-]+[+]?[\w._-]+@[\w.-]+\.[a-zA-Z]{2,6}$/.test(urlFragment)
+    })[0])
+
     // state
     this.state = {
-      currentPage: "login",
-      email: "",
+      language: language === "fr" ? "fr" : "en",
+      currentPage: language ? "login" : null,
+      email: email ? email : "",
       password: "",
       gender: "F",
-      name: "",
+      name: name ? name : "",
       day: 1,
       month: 1,
       year: 1960,
@@ -452,7 +603,6 @@ class PageSelector extends Component {
       country: "france",
       errors: {},
       ready: true,
-      langage: "en",
       hideBirthday: false,
       babyName1: "",
       babyName2: "",
@@ -460,7 +610,8 @@ class PageSelector extends Component {
     }
     // functions
     this.storeData = this.storeData.bind(this)
-    this.submitLogin = this.submitLogin.bind(this)
+    this.login = this.login.bind(this)
+    this.logout = this.logout.bind(this)
     this.goToNewProfilePage = this.goToNewProfilePage.bind(this)
     this.submitProfile = this.submitProfile.bind(this)
     this.submitAnswers = this.submitAnswers.bind(this)
@@ -468,7 +619,7 @@ class PageSelector extends Component {
     this.fetchSurvey = this.fetchSurvey.bind(this)
     this.api = this.api.bind(this)
   }
-  submitLogin() {
+  login() {
     let error = false
     let errorMessages = this.state.errors
     
@@ -501,9 +652,17 @@ class PageSelector extends Component {
     else {
       this.api(
         "login",
-        {email: this.state.email, password: this.state.password}
+        {email: this.state.email, password: this.state.password, language: this.state.language}
       ) 
     }
+  }
+  logout() {
+    this.setState({currentPage: "login"})
+    this.api(
+      "logout",
+      {email: this.state.email},
+      false
+    )     
   }
   goToNewProfilePage() {
     this.api(
@@ -680,21 +839,30 @@ class PageSelector extends Component {
   render() {
     // chooses appropriate page to show
     let showFlags = true
+    let showHeader = true
     let currentPage = null
+    let headerMessage = ""
     switch (this.state.currentPage) {
       default:
-        currentPage = <Flags mainPage/>
+        currentPage = (
+          <Flags
+            language={this.state.language}
+            mainPage
+          />
+        )
         showFlags = false
+        showHeader = false
         break
       case "login":
         currentPage = (
           <Login
             storeData={this.storeData}
-            submitLogin={this.submitLogin}
+            login={this.login}
             errors={this.state.errors}
+            email={this.state.email}
           />
         )
-        showFlags = false
+        showFlags = true
         break
       case "announcement":
         currentPage = (
@@ -758,7 +926,14 @@ class PageSelector extends Component {
         lgOffset={3} mdOffset={2} smOffset={1}
         lg={6} md={8} sm={10}
       >
-        <Header/>
+        {!showHeader ? null :
+          <Header
+          authenticated={this.state.authenticated}
+          currentPage={this.state.currentPage}
+          logout={this.logout}
+          headerMessage={headerMessage}
+        />
+        }
         {this.state.errorMessage ? <Alert bsStyle="danger">{this.state.errorMessage}</Alert> : null}
         {currentPage}
         {showFlags ? <Flags/> : null}

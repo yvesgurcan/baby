@@ -1,0 +1,8 @@
+hr.header {
+    margin-top: 0px;
+}
+
+.override-default .page-header, .override-default  .page-header h1 {
+    border-bottom: none;
+    display: inline;
+}
