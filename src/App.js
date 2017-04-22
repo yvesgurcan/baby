@@ -1,17 +1,24 @@
 import React, {Component} from 'react';
-import {Button, FormControl, Col, PageHeader, Clearfix, Alert, Row, Checkbox} from 'react-bootstrap'
+import {Button, FormControl, Col, Grid, PageHeader, Clearfix, Alert, Row, Checkbox} from 'react-bootstrap'
 import $ from 'jquery'
 import './App.css';
+
+/* SVGs */
 
 class FrenchFlag extends Component {
   render() {
     return (
-                        <svg width={this.props.mainPage ? "200" : "50"} height={this.props.mainPage ? "100" : "25"}  viewBox="0 0 45 26">
-                            <rect width="14" height="26"  x="1" fill="darkblue"></rect>
-                            <rect width="14" height="26"  x="15" fill="white"></rect>
-                            <rect width="14" height="26"  x="29" fill="red"></rect>
-                            <rect width="42" height="26"  x="1" fill="transparent" stroke="darkgray"></rect>
-                        </svg>
+      <svg
+        id="fr"
+        width={this.props.mainPage ? "200" : "50"}
+        height={this.props.mainPage ? "100" : "25"}
+        viewBox="0 0 45 26"
+      >
+        <rect width="14" height="26"  x="1" fill="darkblue"></rect>
+        <rect width="14" height="26"  x="15" fill="white"></rect>
+        <rect width="14" height="26"  x="29" fill="red"></rect>
+        <rect width="42" height="26"  x="1" fill="transparent" stroke="darkgray"></rect>
+      </svg>
     )
   }
 }
@@ -19,7 +26,12 @@ class FrenchFlag extends Component {
 class AmericanFlag extends Component {
   render() {
     return (
-                        <svg width={this.props.mainPage ? "200" : "50"} height={this.props.mainPage ? "100" : "25"} viewBox="0 0 43 26">
+                        <svg
+                          id="en"
+                          width={this.props.mainPage ? "200" : "50"}
+                          height={this.props.mainPage ? "100" : "25"}
+                          viewBox="0 0 43 26"
+                        >
                             <rect width="42" height="2"  fill="crimson"></rect>
                             <rect width="42" height="2"  y="4" fill="crimson"></rect>
                             <rect width="42" height="2"  y="8" fill="crimson"></rect>
@@ -174,40 +186,13 @@ class OrangeMushroom extends Component {
   }
 }
 
-class Flags extends Component {
-  constructor (props) {
-    super(props)
-    // functions
-    this.messages = this.messages.bind(this)
-  }
-  messages() {
-    return {
-      fr: {title: "Choisissez une langue"},
-      en: {title: "Choose your language"}
-    }
-  }
-  render() {
-    let messages = this.messages()[this.props.language]
-    return (
-      <div>
-        <Clearfix/>
-          {!this.props.mainPage ? <hr/> : null}
-          <div className="text-center">
-            {this.props.mainPage ? <PageHeader>{messages.title}</PageHeader> : null}
-            <Clearfix/>
-            <AmericanFlag mainPage={this.props.mainPage} />
-            <FrenchFlag mainPage={this.props.mainPage}/>
-        </div>
-      </div>
-    )
-  }
-}
+/* page layout */
 
 class Header extends Component {
   render() {
     return (
       <div>
-        <Col xs={2} style={{marginTop: "5px"}} >
+        <Col xs={2} style={{marginTop: "5px", marginLeft: "-25px",padding: "0px"}} >
             {this.props.currentPage !== "announcement" ? <GreenMushroom header/> : null}
         </Col>
         <Col xs={8} style={{marginTop: "10px"}} className="text-center">
@@ -223,7 +208,20 @@ class Header extends Component {
   }
 }
 
-class ShowSurvey extends Component {
+class Footer extends Component {
+  render() {
+    return (
+      <Flags
+        switchLanguage={this.props.switchLanguage}
+        submitLanguageShift={this.props.submitLanguageShift}
+      />
+    )
+  }
+}
+
+/* pages main content */
+
+class ShowBabyNameStats extends Component {
   render() {
     return (
       <div>show survey</div>
@@ -231,13 +229,10 @@ class ShowSurvey extends Component {
   }
 }
 
-class Questions extends Component {
-  componentDidMount() {
-    this.props.api(
-      "names",
-      {email: this.props.email},
-      false
-    )
+class ChooseBabyNames extends Component {
+  constructor(props) {
+    super(props)
+    this.props.getBabyNames()
   }
   render() {
     return (
@@ -300,7 +295,7 @@ class Questions extends Component {
               block
               bsSize="large"
               bsStyle="primary"
-              onClick={this.props.submitNames}
+              onClick={this.props.submitBabyNames}
             >Submit Names</Button>
           </Col>
         </Col>
@@ -357,6 +352,7 @@ class CreateProfile extends Component {
   render() {
     return (
       <div>
+        <div className="spacer-top-large"/>
         <Col sm={2}>
           <FormControl
             name="gender"
@@ -495,6 +491,9 @@ class CreateProfile extends Component {
             onClick={this.props.submitProfile}
           >Create Profile</Button>
         </Col>
+        <Clearfix/>
+        <div className="spacer-bottom-large"/>
+        <div className="spacer-bottom-large"/>
       </div>
     )
   }
@@ -504,6 +503,7 @@ class Announcement extends Component {
   render() {
     return (
       <Col sm={12}>
+        <div className="spacer-top"/>
         <svg viewBox="0 -10 570 220">
           <RedMushroom/>
           <GreenMushroom/>
@@ -515,6 +515,8 @@ class Announcement extends Component {
           bsStyle="primary"
           onClick={this.props.goToNewProfilePage}
         >Yes!</Button>
+        <div className="spacer-bottom"/>
+        <div className="spacer-bottom"/>
       </Col>
     )
   }
@@ -527,6 +529,7 @@ class Login extends Component {
           lgOffset={2} mdOffset={3} smOffset={2} xsOffset={1}
           lg={8} md={6} sm={8} xs={10}
           >
+          <div className="spacer-top"/>
           <FormControl
             name="email"
             type="email"
@@ -546,6 +549,7 @@ class Login extends Component {
           <FormControl
             name="password"
             type="password"
+            value={this.props.password}
             bsSize="large"
             className="margin-bottom"
             onChange={this.props.storeData}
@@ -565,60 +569,178 @@ class Login extends Component {
             className="margin-bottom"
             onClick={this.props.login}
           >Enter</Button>
+          <div className="spacer-bottom"/>
+          <div className="spacer-bottom"/>
         </Col>
     )
   }
 }
- 
+
+// Flags is the footer of most pages and also the main content component of the default landing page
+class Flags extends Component {
+  constructor (props) {
+    super(props)
+    // functions
+    this.translation = this.translation.bind(this)
+    this.switchLanguage = this.switchLanguage.bind(this)
+  }
+  translation() {
+    return {
+      fr: {title: "Choisissez une langue"},
+      en: {title: "Choose your language"}
+    }
+  }
+  switchLanguage(input) {
+    // the onMouseOver event does not go any further when user hovers on inner elements of a SVG (because they do not have an id, which would trigger an error in the prop function)
+    if (input.target.id !== "") {
+      // selected language comes from the id attribute of the SVG tag
+      this.props.switchLanguage(input.target.id)
+    }
+  }
+  render() {
+    let translation = this.translation()[this.props.language]
+    return (
+      <div>
+        {this.props.mainPage ? <div className="spacer-top"/> : null}
+        <Clearfix/>
+          {!this.props.mainPage ? <hr/> : null}
+          <div className="text-center">
+            {this.props.mainPage ? <PageHeader>{translation.title}</PageHeader> : null}
+            <Clearfix/>
+            <span
+              onMouseOver={this.switchLanguage} 
+              onClick={this.props.submitLanguageShift ? this.props.submitLanguageShift : this.props.goToLogin}
+            >
+              <AmericanFlag mainPage={this.props.mainPage} />
+            </span>
+            <span
+              onMouseOver={this.switchLanguage}
+              onClick={this.props.submitLanguageShift ? this.props.submitLanguageShift : this.props.goToLogin}
+            >
+              <FrenchFlag mainPage={this.props.mainPage}/>
+            </span>            
+        </div>
+      </div>
+    )
+  }
+}
+
+/* page wrapper */
+
+/*
+  This is where the state of the whole App lives
+  All the other components are stateless
+  French and English translations live in the main page content components
+*/
 class PageSelector extends Component {
   constructor (props) {
     super(props)
-    // get preselected language and email from URL
-    let pathname = window.location.pathname
-    let urlFragments = pathname.split("/")
-    let language = urlFragments.filter(urlFragment => {
-      return urlFragment === "en" || urlFragment === "fr"
-    })[0]
-    let email = urlFragments.filter(urlFragment => {
-      return /^[\w._-]+[+]?[\w._-]+@[\w.-]+\.[a-zA-Z]{2,6}$/.test(urlFragment)
-    })[0]
-    let name = decodeURI(urlFragments.filter(urlFragment => {
-      console.log(urlFragment,urlFragment !== "en" && urlFragment !== "fr" && !/^[\w._-]+[+]?[\w._-]+@[\w.-]+\.[a-zA-Z]{2,6}$/.test(urlFragment))
-      return urlFragment !== "" && urlFragment !== "en" && urlFragment !== "fr" && !/^[\w._-]+[+]?[\w._-]+@[\w.-]+\.[a-zA-Z]{2,6}$/.test(urlFragment)
-    })[0])
 
-    // state
+    this.URLfragments = this.URLfragments.bind(this)
+    this.switchLanguage = this.switchLanguage.bind(this)
+    this.submitLanguageShift = this.submitLanguageShift.bind(this)
+    this.goToLogin = this.goToLogin.bind(this)
+    this.goToNewProfilePage = this.goToNewProfilePage.bind(this)
+    this.login = this.login.bind(this)
+    this.logout = this.logout.bind(this)
+    this.submitProfile = this.submitProfile.bind(this)
+    this.getBabyNames = this.getBabyNames.bind(this)
+    this.submitBabyNames = this.submitBabyNames.bind(this)
+    this.storeData = this.storeData.bind(this)
+    this.api = this.api.bind(this)
+
+    const URLfragments = this.URLfragments()
+
+    // default state
     this.state = {
-      language: language === "fr" ? "fr" : "en",
-      currentPage: language ? "login" : null,
-      email: email ? email : "",
+      language: URLfragments.language === "fr" ? "fr" : "en",
+      email: URLfragments.email ? URLfragments.email : "",
+      name: URLfragments.name ? URLfragments.name : "",
+      currentPage: URLfragments.language ? "login" : null,
       password: "",
       gender: "F",
-      name: name ? name : "",
       day: 1,
       month: 1,
       year: 1960,
+      hideBirthday: false,
       "age-category": "50-74",
-      relationship: "relative",
       country: "france",
+      relationship: "relative",
+      newBabyNames: [],
+      selectedBabyNames: [],
       errors: {},
       ready: true,
-      hideBirthday: false,
-      babyName1: "",
-      babyName2: "",
-      babyName3: "",
     }
-    // functions
-    this.storeData = this.storeData.bind(this)
-    this.login = this.login.bind(this)
-    this.logout = this.logout.bind(this)
-    this.goToNewProfilePage = this.goToNewProfilePage.bind(this)
-    this.submitProfile = this.submitProfile.bind(this)
-    this.submitAnswers = this.submitAnswers.bind(this)
-    this.submitNames = this.submitNames.bind(this)
-    this.fetchSurvey = this.fetchSurvey.bind(this)
-    this.api = this.api.bind(this)
+
   }
+
+  /* get optional user language, email, and name from URL when component mounts */
+  URLfragments() {
+    // get current URL path
+    let pathname = window.location.pathname
+    let urlFragments = pathname.split("/")
+
+    // this filter catches any URL fragment that strictly matches "fr" or "en"
+    // eg, www.yvesgurcan.com/someFolder/babyApp/fr will return "fr"
+    let language = urlFragments.filter(urlFragment => {
+      return urlFragment === "en" || urlFragment === "fr"
+    })[0]
+
+    // this filter catches any URL fragment that is a valid email address
+    // eg, www.yvesgurcan.com/someFolder/babyApp/myemail@test.com will return "myemail@test.com"
+    let email = urlFragments.filter(urlFragment => {
+      return /^[\w._-]+[+]?[\w._-]+@[\w.-]+\.[a-zA-Z]{2,6}$/.test(urlFragment)
+    })[0]
+
+    // this filter catches the last URL fragment (because the previous ones probably are the actual URL path) that is not empty, "en", "fr", or a valid email address.
+    // eg, www.yvesgurcan.com/someFolder/babyApp/Yves will return "Yves"
+    let name = decodeURI(urlFragments.filter(urlFragment => {
+      return urlFragment !== "" && urlFragment !== "en" && urlFragment !== "fr" && !/^[\w._-]+[+]?[\w._-]+@[\w.-]+\.[a-zA-Z]{2,6}$/.test(urlFragment)
+    })).split(",")
+    let resultCount = name.length > 1 ? name.length : 1
+    name = resultCount !== 1 ? name[resultCount-1] : ""
+
+    // the above filters are cumulative
+    // eg, www.yvesgurcan.com/someFolder/babyApp/en/Richard/useremail@test.net will return {language: "en", name: "Richard", email: "useremail@test.net"}
+
+    return {
+      language: language,
+      email: email,
+      name: name,
+    }
+  }
+
+  /* used on Flags component */
+  switchLanguage(language) {
+    this.setState({language: language})
+  }
+  submitLanguageShift() {
+    this.api(
+      "switchLanguage",
+      {
+        email: this.state.email,
+        language: this.state.language,
+      },
+      false
+    )
+  }
+
+  // used on Flags page
+  goToLogin() {
+    this.setState({currentPage: "login"})
+  }
+
+  // used on Announcement page
+  goToNewProfilePage() {
+    this.api(
+      "goToCreateProfile",
+      {email: this.state.email},
+      false
+    )
+    this.setState({currentPage: "createProfile"})
+  }
+
+  // used on Login page
   login() {
     let error = false
     let errorMessages = this.state.errors
@@ -656,6 +778,8 @@ class PageSelector extends Component {
       ) 
     }
   }
+
+  // used in the Header 
   logout() {
     this.setState({currentPage: "login"})
     this.api(
@@ -664,14 +788,8 @@ class PageSelector extends Component {
       false
     )     
   }
-  goToNewProfilePage() {
-    this.api(
-      "goToCreateProfile",
-      {email: this.state.email},
-      false
-    )
-    this.setState({currentPage: "createProfile"})
-  }
+
+  // used on the CreateProfile page
   submitProfile() {
     let error = false
     let errorMessages = this.state.errors
@@ -710,10 +828,18 @@ class PageSelector extends Component {
       ) 
     }
   }
-  submitAnswers() {
 
+  // used on the ChooseBabyNames and ShowBabyNameStats pages
+  getBabyNames() {
+    this.api(
+      "showBabyNames",
+      {email: this.state.email},
+      false
+    )
   }
-  submitNames() {
+
+  // used on the ChooseBabyNames page
+  submitBabyNames() {
     // handle vote for existing names
     // TODO
 
@@ -748,19 +874,33 @@ class PageSelector extends Component {
       )
     }
   }
-  fetchSurvey() {
 
+  // used by forms
+  storeData(input) {
+    let state = this.state
+    // console.log(input.target)
+    if (input.target.type === "checkbox") {
+      state[input.target.name] = input.target.checked
+    }
+    else {
+      state[input.target.name] = input.target.value
+    }
+    this.setState(state)
   }
-  // programatically generated API calls
+
+  // API calls
   api(request,data,spinner = true) {
-    // validates request
+    // validate request
     if (typeof data === 'object' && typeof request === "string") {
         if (request.length && typeof data === "object") {
-        data["request"] = request
+        data.request = request
         console.log("Request sent.","\nData: ",data)
+        // trigger spinner
         if (spinner) {
           this.setState({ready:false})
         }
+        // clear errors
+        this.setState({errors: {}})
         $.ajax({
           url: "https://bu67qviz40.execute-api.us-west-2.amazonaws.com/prod",
           data: data,
@@ -825,58 +965,50 @@ class PageSelector extends Component {
       this.setState({errorMessage: "Sorry, an error occurred."})
     }
   }
-  storeData(input) {
-    let state = this.state
-    // console.log(input.target)
-    if (input.target.type === "checkbox") {
-      state[input.target.name] = input.target.checked
-    }
-    else {
-      state[input.target.name] = input.target.value
-    }
-    this.setState(state)
-  }
+
   render() {
-    // chooses appropriate page to show
-    let showFlags = true
     let showHeader = true
+    let showFooter = true
     let currentPage = null
     let headerMessage = ""
+    // chooses appropriate page to show
     switch (this.state.currentPage) {
       default:
+        showHeader = false
+        showFooter = false
         currentPage = (
           <Flags
-            language={this.state.language}
             mainPage
+            language={this.state.language}
+            switchLanguage={this.switchLanguage}
+            goToLogin={this.goToLogin}
           />
         )
-        showFlags = false
-        showHeader = false
         break
       case "login":
         currentPage = (
           <Login
-            storeData={this.storeData}
-            login={this.login}
-            errors={this.state.errors}
+            language={this.state.language}
             email={this.state.email}
+            password={this.state.password}
+            storeData={this.storeData}
+            errors={this.state.errors}
+            login={this.login}
           />
         )
-        showFlags = true
         break
       case "announcement":
         currentPage = (
           <Announcement
-            goToNewProfilePage={this.goToNewProfilePage}
-          />
+            language={this.state.language}
+            goToNewProfilePage={this.goToNewProfilePage} />
         )
         break
       case "createProfile":
         currentPage = (
           <CreateProfile
-            storeData={this.storeData}
-            submitProfile={this.submitProfile}
-            errors={this.state.errors}
+            language={this.state.language}
+            gender={this.state.gender}
             name={this.state.name}
             email={this.state.email}
             day={this.state.day}
@@ -886,58 +1018,85 @@ class PageSelector extends Component {
             age-category={this.state["age-category"]}
             country={this.state.country}
             relationship={this.state.relationship}
-            gender={this.state.gender}
-          />
-        )
-        break
-      case "questions":
-        currentPage = (
-          <Questions
             storeData={this.storeData}
-            names={this.items}
-            email={this.state.email}
-            api={this.api}
-            babyName1={this.state.babyName1}
-            babyName2={this.state.babyName2}
-            babyName3={this.state.babyName3}
             errors={this.state.errors}
-            submitNames={this.submitNames}
+            submitProfile={this.submitProfile}
           />
         )
         break
-      case "showSurvey":
+      case "chooseBabyNames":
         currentPage = (
-          <ShowSurvey
+          <ChooseBabyNames
+            language={this.state.language}
+            email={this.state.email}
+            getBabyNames={this.getBabyNames}
+            babyNames={this.state.babyNames}
+            newBabyNames={this.state.newBabyNames}
+            selectedBabyNames={this.state.selectedBabyNames}
+            storeData={this.storeData}
+            errors={this.state.errors}
+            submitBabyNames={this.submitBabyNames}
+          />
+        )
+        break
+      case "showBabyNameStats":
+        currentPage = (
+          <ShowBabyNameStats
+            language={this.state.language}
+            babyNames={this.state.babyNames}
           />
         )
         break
     }
 
+    // spinner
     if (!this.state.ready) {
       currentPage = (
-        <div className="text-center">
-          <i className="fa fa-spinner fa-spin" style={{fontSize: "50px"}}></i>
-        </div>
+        <Col className="text-center">
+          <div className="spacer-top"/>
+          <div className="spacer-top"/>
+            <i className="fa fa-spinner fa-spin" style={{fontSize: "50px"}}/>
+         <div className="spacer-bottom"/>
+         <div className="spacer-bottom"/>
+        </Col>
       )
     }
 
     return (
-      <Col
-        lgOffset={3} mdOffset={2} smOffset={1}
-        lg={6} md={8} sm={10}
-      >
-        {!showHeader ? null :
-          <Header
-          authenticated={this.state.authenticated}
-          currentPage={this.state.currentPage}
-          logout={this.logout}
-          headerMessage={headerMessage}
-        />
-        }
-        {this.state.errorMessage ? <Alert bsStyle="danger">{this.state.errorMessage}</Alert> : null}
-        {currentPage}
-        {showFlags ? <Flags/> : null}
-      </Col>
+      <Grid>
+        <Col
+        className="fill"
+          lg={6} lgOffset={3}
+          md={8} mdOffset={2}
+          sm={10} smOffset={1}
+        >
+          {/* header */}
+          {!showHeader ? null :
+            <Header
+              authenticated={this.state.authenticated}
+              currentPage={this.state.currentPage}
+              logout={this.logout}
+              headerMessage={headerMessage}
+            />
+          }
+          {/* API error feedback */}
+          {!this.state.errorMessage ? null :
+            <Alert bsStyle="danger">{this.state.errorMessage}</Alert>
+          }
+          {/* page main content */}
+          
+        <div  className="content">
+          {currentPage}
+        </div>
+          {/* footer */}
+          {!showFooter ? null :
+            <Footer
+              switchLanguage={this.switchLanguage}
+              submitLanguageShift={this.submitLanguageShift}
+            />
+          }
+        </Col>
+      </Grid>
     )
   }
 }
