@@ -989,7 +989,10 @@ class PageSelector extends Component {
           newBabyName1: this.state.newBabyName1,
           newBabyName2: this.state.newBabyName2,
           newBabyName3: this.state.newBabyName3,
-          selectedBabyNames: this.state.selectedBabyNames
+          selectedBabyNames: this.state.selectedBabyNames,
+          gender: this.state.gender,
+          country: this.state.country,
+          relationship: this.state.relationship,
         }
         ,
         false
