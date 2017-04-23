@@ -3,6 +3,32 @@ import {Button, FormControl, Col, Grid, PageHeader, Clearfix, Alert, Row, Checkb
 import $ from 'jquery'
 import './App.css';
 
+const currentYear = new Date().getFullYear()
+
+// default state
+// all these values can be modified at will, the App should handle gracefully any unexpected or weird value
+const defaultState = {
+      language: "de",
+      languageChoices: ["en","fr"],
+      gender: "X",
+      day: 50,
+      month: "lol",
+      year: 500,
+      minYear: Math.floor((currentYear - 100) / 5) * 5,
+      maxYear: Math.ceil((currentYear - 2000) / 5) * 5,
+      hideBirthday: "xxx",
+      "age-category": "99-74",
+      ageCategoryChoices: ["24-","25-49","50-74","75+"],
+      country: "www",
+      countryChoices: ["usa","france"],
+      relationship: "relative",
+      relationshipChoices: ["relative","friend","coworker"],
+      maxNewBabyNames: "a",
+      maxSelectableBabyNames: 5,
+}
+
+const test = {}
+
 /* spinner */
 
 class LocalSpinner extends Component {
@@ -270,7 +296,7 @@ class ChooseBabyNames extends Component {
             bsSize="large"
             bsStyle="success"
             className="margin-bottom margin-right"
-            active={this.props.selectedBabyNames.indexOf(babyName.name) > -1 ? true : false}
+            active={String(this.props.selectedBabyNames).indexOf(babyName.name) > -1 ? true : false}
             onClick={this.props.selectBabyName}
           >
             {babyName.name}
@@ -394,52 +420,9 @@ class CreateProfile extends Component {
       },
     }
   }
-  componentWillMount() {
-    // if necessary, reinstate gender
-    if (this.props.gender !== "M" && this.props.gender !== "F") {
-      this.props.storeData({target: {name: "gender", value: "F"}})
-    }
-    // if necessary, reinstate the default year to the range
-    if (this.props.minYear < this.props.maxYear) {
-      if (this.props.year > this.props.maxYear) {
-        this.props.storeData({target: {name: "year", value: this.props.maxYear}})
-      }
-      else if (this.props.year < this.props.minYear) {
-        this.props.storeData({target: {name: "year", value: this.props.minYear}})
-      }
-    }
-    else {
-      if (this.props.year < this.props.maxYear) {
-        this.props.storeData({target: {name: "year", value: this.props.maxYear}})
-      }
-      else if (this.props.year > this.props.minYear) {
-        this.props.storeData({target: {name: "year", value: this.props.minYear}})
-      }
-    }
-    // if necessary, reinstate the default month to the range
-    const month = {"January":1,"February":2,"March":3,"April":4,"May":5,"June":6,"July":7,"August":8,"September":9,"October":10,"November":11,"December":12}
-    const monthShort = {"Jan":1,"Feb":2,"Mar":3,"Apr":4,"May":5,"Jun":6,"Jul":7,"Aug":8,"Sep":9,"Oct":10,"Nov":11,"Dec":12}
-    if (typeof month[this.props.month] !== "undefined") {
-      this.props.storeData({target: {name: "month", value: month[this.props.month]}})
-    }
-    if (typeof monthShort[this.props.month] !== "undefined") {
-      this.props.storeData({target: {name: "month", value: monthShort[this.props.month]}})
-    }
-    if (this.props.month < 0 || this.props > 12) {
-      this.props.storeData({target: {name: "month", value: 1}})
-    }
-    // if necessary, reinstate the default day to the range
-    const totalDays = new Date(this.props.year, this.props.month, 0).getDate()
-    if (this.props.day < 0 || this.props.day > totalDays) {
-      this.props.storeData({target: {name: "day", value: 1}})
-    }
-    // if necessary, reinstate the default country to the range
-    if (this.props.countryChoices.indexOf(this.props.country) === -1) {
-      this.props.storeData({target: {name: "country", value: this.props.countryChoices[0]}})
-    }
-    // if necessary, reinstate the default relationship to the range
-    if (this.props.relationshipChoices.indexOf(this.props.relationship) === -1) {
-      this.props.storeData({target: {name: "relationship", value: this.props.relationshipChoices[0]}})
+  autoSubmitForm(input) {
+    if(input.key === "Enter") {
+      this.props.submitProfile()
     }
   }
   gender() {
@@ -461,7 +444,7 @@ class CreateProfile extends Component {
     const totalDays = new Date(this.props.year, this.props.month, 0).getDate()
     // console.log(totalDays)
     for (var i = 1; i <= totalDays; i++) {
-      let number = 1
+      let number = i
       if (this.props.language === "fr") {
         number = i === 1 ? "1er" : i
       }
@@ -487,8 +470,8 @@ class CreateProfile extends Component {
       }
     }
     else {
-      for (var i = this.props.minYear; i >= this.props.maxYear; i--) {
-        years.push(<option key={i} value={i}>{i}</option>)
+      for (var x = this.props.minYear; x >= this.props.maxYear; x--) {
+        years.push(<option key={x} value={x}>{x}</option>)
       }
     }
     return years
@@ -498,9 +481,9 @@ class CreateProfile extends Component {
       fr: [{id:"24-",name:"24 et moins"},{name:"entre 25 ans et 49 ans",id:"25-49"},{id:"50-74",name:"entre 50 et 74 ans"},{id:"75+",name:"75 ans et plus"}],
       en: [{id:"24-",name:"24 or younger"},{id:"25-49",name:"between 25 and 49"},{id:"50-74",name:"between 50 and 74"},{id:"75+",name:"75 or older"}],
     }
-    let ageCategories = categories[this.props.language].map((category) => {
+    let ageCategories = this.props.ageCategoryChoices.map((category,index) => {
       // console.log(category)
-      return <option key={category.id} value={category.id}>{category.name}</option>
+      return <option key={category} value={category}>{categories[this.props.language][index].name}</option>
     })
     return ageCategories
   }
@@ -527,7 +510,7 @@ class CreateProfile extends Component {
   render() {
     let box1, box2
     let dayDropdown = (
-            <Col sm={2}>
+            <Col sm={3}>
               <FormControl
                 name="day"
                 value={this.props.day}
@@ -575,6 +558,7 @@ class CreateProfile extends Component {
               bsSize="large"
               className="margin-bottom"
               onChange={this.props.storeData}
+              onKeyPress={this.autoSubmitForm}
             >
             {this.gender().large}
             </FormControl>
@@ -587,6 +571,7 @@ class CreateProfile extends Component {
               bsSize="large"
               className="margin-bottom"
               onChange={this.props.storeData}
+              onKeyPress={this.autoSubmitForm}
             >
             {this.gender().small}
             </FormControl>
@@ -599,6 +584,7 @@ class CreateProfile extends Component {
             bsSize="large"
             className="margin-bottom"
             onChange={this.props.storeData}
+            onKeyPress={this.autoSubmitForm}
           />
           {
             !this.props.errors.name ?
@@ -620,7 +606,7 @@ class CreateProfile extends Component {
         <Row>
           {!this.props.hideBirthday ?
           <Col sm={11}>
-            <Col sm={2}></Col>
+            <Col sm={1}></Col>
             {box1}
             {box2}
             <Col sm={3}>
@@ -631,6 +617,7 @@ class CreateProfile extends Component {
                 bsSize="large"
                 className="margin-bottom"
                 onChange={this.props.storeData}
+                onKeyPress={this.autoSubmitForm}
               >
                 {this.years()}
               </FormControl>
@@ -646,6 +633,7 @@ class CreateProfile extends Component {
                 bsSize="large"
                 className="margin-bottom"
                 onChange={this.props.storeData}
+                onKeyPress={this.autoSubmitForm}
               >
                 {this.ageCategories()}
               </FormControl>
@@ -663,6 +651,7 @@ class CreateProfile extends Component {
                   bsSize="large"
                   className="margin-bottom"
                   onChange={this.props.storeData}
+                  onKeyPress={this.autoSubmitForm}
                 />
                 {translation.hideBirthday}
               </label>
@@ -677,6 +666,7 @@ class CreateProfile extends Component {
             bsSize="large"
             className="margin-bottom"
             onChange={this.props.storeData}
+            onKeyPress={this.autoSubmitForm}
           >
             {this.residences()}
           </FormControl>
@@ -689,6 +679,7 @@ class CreateProfile extends Component {
             bsSize="large"
             className="margin-bottom"
             onChange={this.props.storeData}
+            onKeyPress={this.autoSubmitForm}
           >
             {this.relationships()}
           </FormControl>
@@ -733,11 +724,26 @@ class Announcement extends Component {
 }
 
 class Login extends Component {
+  constructor(props) {
+    super(props)
+    this.autoSubmitForm = this.autoSubmitForm.bind(this)
+    this.login = this.login.bind(this)
+  }
+  login() {
+    this.props.login($("[name=password]").val())
+  }
+  autoSubmitForm(input) {
+    if (input.key === "Enter") {
+      this.props.login($("[name=password]").val())
+    }
+  }
   render() {
     return (
         <Col
-          lgOffset={2} mdOffset={3} smOffset={2} xsOffset={1}
-          lg={8} md={6} sm={8} xs={10}
+          lg={8} lgOffset={2} 
+          md={8} mdOffset={2} 
+          sm={8} smOffset={2} 
+          xs={10} xsOffset={1}
           >
           <div className="spacer-top"/>
           <FormControl
@@ -747,6 +753,7 @@ class Login extends Component {
             bsSize="large"
             className="margin-bottom"
             onChange={this.props.storeData}
+            onKeyPress={this.autoSubmitForm}
           />
           {
             !this.props.errors.email ?
@@ -759,10 +766,9 @@ class Login extends Component {
           <FormControl
             name="password"
             type="password"
-            value={this.props.password}
             bsSize="large"
             className="margin-bottom"
-            onChange={this.props.storeData}
+            onKeyPress={this.autoSubmitForm}
           />
           {
             !this.props.errors.password ?
@@ -777,7 +783,7 @@ class Login extends Component {
             bsStyle="primary"
             bsSize="large"
             className="margin-bottom"
-            onClick={this.props.login}
+            onClick={this.login}
           >Enter</Button>
           <div className="spacer-bottom"/>
           <div className="spacer-bottom"/>
@@ -863,41 +869,55 @@ class PageSelector extends Component {
 
     const URLfragments = this.URLfragments()
 
-    var currentYear = new Date()
-    currentYear = currentYear.getFullYear()
-
-    // default state
-    // all these values can be modified at will, the App should handle gracefully any unexpected value
-    this.state = {
-      language: URLfragments.language === "fr" ? "fr" : "en",
-      email: URLfragments.email ? URLfragments.email : "",
-      name: URLfragments.name ? URLfragments.name : "",
-      currentPage: URLfragments.language ? "login" : null,
-      password: "",
-      gender: "F",
-      day: 1,
-      month: "January",
-      year: 1960,
-      minYear: Math.floor((currentYear - 80) / 5) * 5,
-      maxYear: Math.ceil((currentYear - 15) / 5) * 5,
-      hideBirthday: false,
-      "age-category": "50-74",
-      country: "www",
-      countryChoices: ["france","usa"],
-      relationship: "relative",
-      relationshipChoices: ["relative","friend","coworker"],
-      maxNewBabyNames: 7,
-      maxSelectableBabyNames: 5,
-      selectedBabyNames: "",
-      errors: {},
-      warnings: {},
-      ready: true,
-      backgroundQueryReady: true,
+    // check URL language
+    let language = URLfragments.language 
+    if (!language) {
+      language = defaultState.languageChoices[0]
+      console.log("No supported language was found in the URL. Language was set to '" + language + "' (default language).")
     }
 
-    for (var i = 1; i <= this.state.maxNewBabyNames; i++) {
-      this.state["newBabyName" + i] = ""
+    // built-in start state
+    // you should probably not change these values
+    // see top of this page to customize the state of the App
+    let defaultUserState = defaultState
+    defaultUserState.language = language
+    defaultUserState.email = URLfragments.email ? URLfragments.email : ""
+    defaultUserState.name = URLfragments.name ? URLfragments.name : ""
+    defaultUserState.currentPage = URLfragments.language ? "login" : null
+    defaultUserState.errors = {}
+    defaultUserState.warnings =  {}
+    defaultUserState.ready = true
+    defaultUserState.backgroundQueryReady = true
+
+    // check default max number of new baby names
+    const arbitraryMaxNewBabyNames = 3
+
+    if (isNaN(defaultState.maxNewBabyNames)) {console.warn("Invalid maxNewBabyNames '" + defaultState.maxNewBabyNames + "' was replaced by fallback '" + arbitraryMaxNewBabyNames + "'.")}
+
+    defaultUserState.maxNewBabyNames =
+      !isNaN(defaultState.maxNewBabyNames)
+      ? defaultState.maxNewBabyNames
+      : arbitraryMaxNewBabyNames
+
+    test.defaultUserStateMaxNewBabyNames = defaultUserState.maxNewBabyNames
+
+    // check default max number of selectable baby names
+    const arbitraryMaxSelectableBabyNames = 3
+
+    if (isNaN(defaultState.maxNewBabyNames)) {console.log("Invalid maxSelectableBabyNames '" + defaultState.maxSelectableBabyNames + "' was replaced by fallback '" + arbitraryMaxNewBabyNames + "'.")}
+
+    defaultUserState.maxSelectableBabyNames =
+      !isNaN(defaultState.maxNewBabyNames)
+      ? defaultState.maxSelectableBabyNames
+      : arbitraryMaxSelectableBabyNames
+    
+    test.defaultUserStateMaxSelectableBabyNames = defaultUserState.maxSelectableBabyNames
+
+    for (var i = 1; i <= defaultUserState.maxNewBabyNames; i++) {
+      defaultUserState["newBabyName" + i] = ""
     }
+
+    this.state = defaultUserState
 
   }
 
@@ -910,7 +930,7 @@ class PageSelector extends Component {
     // this filter catches any URL fragment that strictly matches "fr" or "en"
     // eg, www.yvesgurcan.com/someFolder/babyApp/fr will return "fr"
     let language = urlFragments.filter(urlFragment => {
-      return urlFragment === "en" || urlFragment === "fr"
+      return urlFragment !== "" && String(defaultState.languageChoices).indexOf(urlFragment) > -1
     })[0]
 
     // this filter catches any URL fragment that is a valid email address
@@ -919,10 +939,10 @@ class PageSelector extends Component {
       return /^[\w._-]+[+]?[\w._-]+@[\w.-]+\.[a-zA-Z]{2,6}$/.test(urlFragment)
     })[0]
 
-    // this filter catches the last URL fragment (because the previous ones probably are the actual URL path) that is not empty, "en", "fr", or a valid email address.
+    // this filter catches the last URL fragment (because the previous ones probably are the actual URL path) that is not empty, a language, or a valid email address.
     // eg, www.yvesgurcan.com/someFolder/babyApp/Yves will return "Yves"
     let name = decodeURI(urlFragments.filter(urlFragment => {
-      return urlFragment !== "" && urlFragment !== "en" && urlFragment !== "fr" && !/^[\w._-]+[+]?[\w._-]+@[\w.-]+\.[a-zA-Z]{2,6}$/.test(urlFragment)
+      return urlFragment !== "" && String(defaultState.languageChoices).indexOf(urlFragment) > -1 && !/^[\w._-]+[+]?[\w._-]+@[\w.-]+\.[a-zA-Z]{2,6}$/.test(urlFragment)
     })).split(",")
     let resultCount = name.length > 1 ? name.length : 1
     name = resultCount !== 1 ? name[resultCount-1] : ""
@@ -937,10 +957,9 @@ class PageSelector extends Component {
     }
   }
 
-  // used on first load
-  // maintain user session if still authenticated and load baby names silently
+  // try to maintain user session if still authenticated and load baby names silently
   componentDidMount() {
-    if (this.state.currentPage === "login") {
+    if (this.state.currentPage === "login" && this.state.email !== "") {
       const URLfragments = this.URLfragments()
       let that = this
       // wait a millisecond to receive auto-fill input from the user's browser
@@ -954,6 +973,126 @@ class PageSelector extends Component {
         },
         1)
     }
+    // triggers the state check manually
+    this.componentDidUpdate()
+  }
+
+  // catch any weird change to the state at any point
+  // populates the state with default data
+  componentDidUpdate(prevProps,prevState) {
+    var fallback = null
+
+    // check language
+    if (String(defaultState.languageChoices).indexOf(this.state.language) === -1) {
+      fallback = defaultState.languageChoices[0]
+      this.storeRawData({language: fallback})
+      console.warn("Unsupported language '" + this.state.language + "'. Language set to fallback '" + fallback + "'.")
+    }
+
+    // check current page
+    if (this.state.currentPage !== "login"
+    && this.state.currentPage !=="announcement"
+    && this.state.currentPage !=="createProfile"
+    && this.state.currentPage !=="chooseBabyNames"
+    && this.state.currentPage !=="showBabyNameStats"
+    && this.state.currentPage !== null) {
+      fallback = "login"
+      console.log(prevState.currentPage,this.state.currentPage)
+      this.storeRawData({currentPage: fallback})
+      console.warn("Incorrect page '" + this.state.currentPage + "' was replaced by fallback '" + fallback + "'.")
+    }
+
+    // check gender
+    if (this.state.gender !== "M" && this.state.gender !== "F") {
+      fallback = "F"
+      this.storeRawData({gender: fallback})
+      console.warn("Incorrect gender '" + this.state.gender + "' was replaced by fallback '" + fallback + "'.")
+    }
+    // check year range
+    let minYear = this.state.minYear
+    let maxYear = this.state.maxYear
+    if (minYear > maxYear) {
+      this.storeRawData({minYear: maxYear, maxYear: minYear})
+      console.warn("Incorrect year range (min: " + this.state.minYear + ", max: " + this.state.maxYear + ") was reversed.")
+      minYear = maxYear
+      maxYear = minYear
+    }
+    // check year
+    if (this.state.year > maxYear) {
+      fallback = maxYear
+      this.storeRawData({year: fallback})
+      console.warn("Out of range year '" + this.state.year + "' was replaced by maximum year fallback '" + fallback + "'.")
+    }
+    else if (this.state.year < minYear) {
+      fallback = minYear
+      this.storeRawData({year: fallback})
+      console.warn("Out of range year '" + this.state.year + "' was replaced by minimum year fallback '" + fallback + "'.")
+
+    }
+    // check month
+    const month = {"January":1,"February":2,"March":3,"April":4,"May":5,"June":6,"July":7,"August":8,"September":9,"October":10,"November":11,"December":12}
+    const monthShort = {"Jan":1,"Feb":2,"Mar":3,"Apr":4,"May":5,"Jun":6,"Jul":7,"Aug":8,"Sep":9,"Oct":10,"Nov":11,"Dec":12}
+    if (typeof month[this.props.month] !== "undefined") {
+      fallback = month[this.state.month]
+      this.storeRawData({month: fallback})
+      console.warn("String '" + this.state.month + "' was replaced by numeric '" + fallback + "'.")
+    }
+    else if (typeof monthShort[this.props.month] !== "undefined") {
+      fallback = monthShort[this.state.month]
+      this.storeRawData({month: fallback})
+      console.warn("String '" + this.state.month + "' was replaced by numeric '" + fallback + "'.")
+    }
+    else if (isNaN(this.state.month) || this.state.month < 0 || this.state.month > 12) {
+      fallback = 1
+      this.storeRawData({month: fallback})
+      console.warn("Invalid month '" + this.state.month + "' was replaced by fallback '" + fallback + "'.")
+    }
+    // check day
+    let totalDaysInCurrentMonth = new Date(this.state.year, this.state.month, 0).getDate()
+    if (isNaN(this.state.day) || this.state.day < 0 || this.state.day > totalDaysInCurrentMonth) {
+      fallback = 1
+      this.storeRawData({day: fallback})
+      console.warn("Invalid day '" + this.state.day + "' was replaced by fallback '" + fallback + "'.")
+    }
+    // check hideBirthday
+    if (this.state.hideBirthday !== true && this.state.hideBirthday !== false) {
+      fallback = true
+      this.storeRawData({hideBirthday: fallback})
+      console.warn("Invalid hideBirthday '" + this.state.hideBirthday + "' was replaced by fallback '" + fallback + "'.")
+    }
+    // check age-category
+    if (this.state.ageCategoryChoices.indexOf(this.state["age-category"]) === -1) {
+      fallback = this.state.ageCategoryChoices[0]
+      this.storeRawData({"age-category": fallback})
+      console.warn("Invalid age-category '" + this.state["age-category"] + "' was replaced by fallback '" + fallback + "'.")
+    }
+    // check country
+    if (this.state.countryChoices.indexOf(this.state.country) === -1) {
+      fallback = this.state.countryChoices[0]
+      this.storeRawData({country: fallback})
+      console.warn("Invalid country '" + this.state.country + "' was replaced by fallback '" + fallback + "'.")
+    }
+    // check relationship
+    if (this.state.relationshipChoices.indexOf(this.state.relationship) === -1) {
+      fallback = this.state.relationshipChoices[0]
+      this.storeRawData({relationship: fallback})
+      console.warn("Invalid relationship '" + this.state.relationship + "' was replaced by fallback '" + fallback + "'.")
+    }
+
+    // prevent changes on maxBabyNames
+    if (this.state.maxNewBabyNames !== test.defaultUserStateMaxNewBabyNames) {
+      fallback = test.defaultUserStateMaxNewBabyNames
+      this.storeRawData({maxNewBabyNames: fallback})
+      console.warn("You can not change maxNewBabyNames from '" + fallback + "' to '" + this.state.maxNewBabyNames + "' once the App was mounted.")
+    }
+
+    // prevent changes on max SelectableBabyNames
+    if (this.state.maxSelectableBabyNames !== test.defaultUserStateMaxSelectableBabyNames) {
+      fallback = test.defaultUserStateMaxSelectableBabyNames
+      this.storeRawData({maxSelectableBabyNames: fallback})
+      console.warn("You can not change maxSelectableBabyNames from '" + fallback + "' to '" + this.state.maxSelectableBabyNames + "' once the App was mounted.")
+    }
+
   }
 
   /* used on Flags component */
@@ -987,7 +1126,7 @@ class PageSelector extends Component {
   }
 
   // used on Login page
-  login() {
+  login(password = "") {
     let error = false
     let errorMessages = this.state.errors
     
@@ -1005,7 +1144,7 @@ class PageSelector extends Component {
     }
 
     // validates password
-    if (this.state.password.length === 0) {
+    if (password.length === 0) {
       error = true
       errorMessages["password"] = "Please enter the password."
     }
@@ -1020,9 +1159,10 @@ class PageSelector extends Component {
     else {
       this.api(
         "login",
-        {email: this.state.email, password: this.state.password, language: this.state.language}
+        {email: this.state.email, password: password, language: this.state.language}
       )
-      // also silently load baby names
+      delete this.state.password
+      // silently load baby names
       this.getBabyNames()
     }
   }
@@ -1035,7 +1175,9 @@ class PageSelector extends Component {
       {email: this.state.email},
       false
     )
-    this.setState({authenticated: false})   
+    this.setState({
+      authenticated: false
+    })   
   }
 
   // used on the CreateProfile page
@@ -1090,7 +1232,10 @@ class PageSelector extends Component {
   /* used on the ChooseBabyNames */
   selectBabyName(input) {
     let selectedBabyNames = this.state.selectedBabyNames
-    if (selectedBabyNames.indexOf(input.target.name) === -1) {
+    if (typeof selectedBabyNames === "undefined") {
+      selectedBabyNames = ""
+    }
+    if (String(selectedBabyNames).indexOf(input.target.name) === -1) {
       selectedBabyNames += input.target.name + ","
     }
     else {
@@ -1109,8 +1254,9 @@ class PageSelector extends Component {
     let errorMessages = this.state.errors
     
     let selectableNameCount = Math.min(this.state.maxSelectableBabyNames,this.state.nameCount)
-    let selectedBabyNames = this.state.selectedBabyNames.split(",")
-    let selectedNameCount = this.state.selectedBabyNames === "" ? 0 : selectedBabyNames.length - 1
+    let selectedBabyNames = this.state.selectedBabyNames
+    selectedBabyNames = selectedBabyNames.substring(0,selectedBabyNames.lastIndexOf(",")).split(",")
+    let selectedNameCount = this.state.selectedBabyNames === "" ? 0 : selectedBabyNames.length
 
     // handle vote errors for existing names
     if (selectedNameCount > selectableNameCount) {
@@ -1127,7 +1273,7 @@ class PageSelector extends Component {
       if (this.state["newBabyName" + i] === "") {
         emptyNewBabyNames++
       }
-      else if (/[^A-Za-z-]/.test(this.state["newBabyName" + i])) {
+      else if (/[^A-Za-zàâäèéêëîïôœùûüÿçÀÂÄÈÉÊËÎÏÔŒÙÛÜŸÇ-]/.test(this.state["newBabyName" + i])) {
         errorMessages["newBabyName" + i] = "Please enter a valid name."
         error = true
       }
@@ -1182,9 +1328,10 @@ class PageSelector extends Component {
     }
     else {
       var requestObject = {}
-      for (var i = 1; i <= this.state.maxNewBabyNames; i++) {
-        requestObject["newBabyName" + i] = this.state["newBabyName" + i]
+      for (var x = 1; x <= this.state.maxNewBabyNames; x++) {
+        requestObject["newBabyName" + x] = this.state["newBabyName" + x]
       }
+      requestObject.email = this.state.email
       requestObject.newBabyNameCount = this.state.maxNewBabyNames
       requestObject.selectedBabyNames = this.state.selectedBabyNames
       requestObject.gender = this.state.gender
@@ -1200,7 +1347,6 @@ class PageSelector extends Component {
 
   // used by forms
   storeData(input) {
-    console.log(input.target)
     let state = this.state
     if (input.target.type === "checkbox") {
       state[input.target.name] = input.target.checked
@@ -1215,13 +1361,17 @@ class PageSelector extends Component {
     this.setState(state)
   }
 
+  // used internally
+  storeRawData(dataObject) {
+    this.setState(dataObject)
+  }
+
   // API calls
   api(request, data, spinner = true) {
     // validate request
     if (typeof data === 'object' && typeof request === "string") {
         if (request.length && typeof data === "object") {
         data.request = request
-        console.log("Request sent.","\nData: ",data)
         // trigger spinner
         if (spinner === "backgroundQuerySpinner") {
           this.setState({backgroundQueryReady:false})
@@ -1232,12 +1382,19 @@ class PageSelector extends Component {
         // clear errors
         this.setState({errors: {}, serverError: null})
         $.ajax({
+          type: "GET",
           url: "https://bu67qviz40.execute-api.us-west-2.amazonaws.com/prod",
           data: data,
           contentType: 'application/json',
           dataType: 'json',
           context: this,
-          header: {'Access-Control-Allow-Origin':'*'},
+          crossDomain: true,
+          beforeSend: function() {
+            if (typeof data.password !== "undefined") {
+              data.password = data.password.replace(/./g,"*")
+            }
+            console.log("Request sent.","\nData: ",data)
+          },
           success: function(response) {
             if (spinner === "backgroundQuerySpinner") {
               this.setState({backgroundQueryReady:true})
@@ -1293,6 +1450,15 @@ class PageSelector extends Component {
                 "\nResponse:",response,
               )
             }
+          },
+          error: function() {
+            if (spinner === "backgroundQuerySpinner") {
+              this.setState({backgroundQueryReady:true})
+            }
+            else if (spinner) {
+              this.setState({ready:true})
+            }
+            this.setState({errorMessage: "Sorry, an error occurred."})
           }
         })
       }
@@ -1361,6 +1527,7 @@ class PageSelector extends Component {
             maxYear={this.state.maxYear}
             hideBirthday={this.state.hideBirthday}
             age-category={this.state["age-category"]}
+            ageCategoryChoices={this.state.ageCategoryChoices}
             country={this.state.country}
             countryChoices={this.state.countryChoices}
             relationship={this.state.relationship}
@@ -1413,10 +1580,9 @@ class PageSelector extends Component {
     return (
       <Grid>
         <Col
-        className="fill"
-          lg={6} lgOffset={3}
-          md={8} mdOffset={2}
-          sm={10} smOffset={1}
+          lg={8} lgOffset={2}
+          md={10} mdOffset={1}
+          sm={12}
         >
           {/* header */}
           {!showHeader ? null :
