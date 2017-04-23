@@ -132,7 +132,7 @@ class GreenMushroom extends Component {
                     {/* mushroom 2 */}
                     {/* hat */}
                     <circle cx="285" cy="150" r="65" clipPath="url(#cut-off-bottom-mushroom2)" fill="lightgreen" stroke="black" strokeWidth="3"></circle>
-                    <clipPath id="cut-off-bottom-mushroom2"><rect x="110" y="" width="245" height="145" /></clipPath>
+                    <clipPath id="cut-off-bottom-mushroom2"><rect x="110" y="0" width="245" height="145" /></clipPath>
                     {/* spots on the hat */}
                     <circle cx="230" cy="125" r="11" fill="white" stroke="none"></circle>
                     <circle cx="265" cy="140" r="7" fill="white" stroke="none"></circle>
@@ -193,12 +193,12 @@ class Header extends Component {
     return (
       <div>
         <Col xs={2} style={{marginTop: "5px", marginLeft: "-25px",padding: "0px"}} >
-            {this.props.currentPage !== "announcement" ? <GreenMushroom header/> : null}
+            <GreenMushroom header/>
         </Col>
         <Col xs={8} style={{marginTop: "10px"}} className="text-center">
           <div className="override-default"><PageHeader>{this.props.headerMessage}</PageHeader></div>
         </Col>
-        <Col xs={2}  style={{marginTop: "22.5px"}} className="text-right">
+        <Col xs={2}  style={{marginTop: "22.5px", paddingRight: "0px"}} className="text-right">
           <a className="logout" hidden={!this.props.authenticated} onClick={this.props.logout}>Logout</a>
         </Col>
         <Clearfix/>
@@ -232,74 +232,120 @@ class ShowBabyNameStats extends Component {
 class ChooseBabyNames extends Component {
   constructor(props) {
     super(props)
-    this.props.getBabyNames()
   }
   render() {
+    //
+    let babyNames = null
+    if (this.props.babyNames) {
+      babyNames = this.props.babyNames.map(babyName => {
+        return (
+          <Button
+            key={babyName.name}
+            name={babyName.name}
+            bsSize="large"
+            bsStyle="success"
+            className="margin-bottom margin-right"
+            active={this.props.selectedBabyNames.indexOf(babyName.name) > -1 ? true : false}
+            onClick={this.props.selectBabyName}
+          >
+            {babyName.name}
+          </Button>)
+      })
+    }
     return (
       <div>
+        <Col sm={12}>
+          <Col sm={12}>
+            {babyNames}
+          </Col>
+          <Clearfix/>
+          {
+            !this.props.warnings.selectedBabyNames ?
+            null :
+            <Alert
+              bsStyle="info"
+              className={this.props.confirmBabyNamesSubmit ? "warning" : null}
+            >
+              {this.props.warnings.selectedBabyNames}
+            </Alert>
+          }
+        </Col>
+        <Clearfix/>
         <hr/>
         <Col sm={12}>
           <Col sm={4}>
             <FormControl
-              name="babyName1"
-              value={this.props.babyName1}
+              name="newBabyName1"
+              value={this.props.newBabyName1}
               bsSize="large"
               className="margin-bottom"
               onChange={this.props.storeData}
             />
             {
-              !this.props.errors.babyName1 ?
+              !this.props.errors.newBabyName1 ?
               null :
               <Alert
               bsStyle="danger">
-              {this.props.errors.babyName1}
+              {this.props.errors.newBabyName1}
               </Alert>
             }
           </Col>
           <Col sm={4}>
             <FormControl
-              name="babyName2"
-              value={this.props.babyName2}
+              name="newBabyName2"
+              value={this.props.newBabyName2}
               bsSize="large"
               className="margin-bottom"
               onChange={this.props.storeData}
             />
             {
-              !this.props.errors.babyName2 ?
+              !this.props.errors.newBabyName2 ?
               null :
               <Alert
               bsStyle="danger">
-              {this.props.errors.babyName2}
+              {this.props.errors.newBabyName2}
               </Alert>
             }
           </Col>
           <Col sm={4}>
             <FormControl
-              name="babyName3"
-              value={this.props.babyName3}
+              name="newBabyName3"
+              value={this.props.newBabyName3}
               bsSize="large"
               className="margin-bottom"
               onChange={this.props.storeData}
             />
             {
-              !this.props.errors.babyName3 ?
+              !this.props.errors.newBabyName3 ?
               null :
               <Alert
-              bsStyle="danger">
-              {this.props.errors.babyName3}
+                bsStyle="danger"
+              >
+              {this.props.errors.newBabyName3}
               </Alert>
             }
           </Col>
-          <Col sm={12}>
-            <Button
-              block
-              bsSize="large"
-              bsStyle="primary"
-              onClick={this.props.submitBabyNames}
-            >Submit Names</Button>
-          </Col>
+          <Clearfix/>
+          {
+            !this.props.warnings.newBabyNames ?
+            null :
+            <Alert
+              bsStyle="info"
+            >
+              {this.props.warnings.newBabyNames}
+            </Alert>
+          }
         </Col>
-      </div>
+        <hr/>
+        <Col sm={12}>
+          <Button
+            block
+            bsSize="large"
+            bsStyle="primary"
+            onClick={this.props.confirmBabyNamesSubmit ? this.props.overrideBabyNameWarning: this.props.submitBabyNames}
+          >Submit Names</Button>
+      </Col>
+    </div>
     )
   }
 }
@@ -491,7 +537,6 @@ class CreateProfile extends Component {
             onClick={this.props.submitProfile}
           >Create Profile</Button>
         </Col>
-        <Clearfix/>
         <div className="spacer-bottom-large"/>
         <div className="spacer-bottom-large"/>
       </div>
@@ -645,9 +690,11 @@ class PageSelector extends Component {
     this.logout = this.logout.bind(this)
     this.submitProfile = this.submitProfile.bind(this)
     this.getBabyNames = this.getBabyNames.bind(this)
+    this.selectBabyName = this.selectBabyName.bind(this)
+    this.overrideBabyNameWarning = this.overrideBabyNameWarning.bind(this)
     this.submitBabyNames = this.submitBabyNames.bind(this)
     this.storeData = this.storeData.bind(this)
-    this.api = this.api.bind(this)
+    this.api = this.api.bind(this)    
 
     const URLfragments = this.URLfragments()
 
@@ -666,12 +713,20 @@ class PageSelector extends Component {
       "age-category": "50-74",
       country: "france",
       relationship: "relative",
-      newBabyNames: [],
-      selectedBabyNames: [],
+      newBabyName1: "",
+      newBabyName2: "",
+      newBabyName3: "",
+      selectedBabyNames: "",
       errors: {},
+      warnings: {},
       ready: true,
     }
 
+  }
+
+  componentDidMount() {
+    const URLfragments = this.URLfragments()
+    this.api("auto-login", {email: URLfragments.email ? URLfragments.email : this.state.email}, false)
   }
 
   /* get optional user language, email, and name from URL when component mounts */
@@ -737,7 +792,7 @@ class PageSelector extends Component {
       {email: this.state.email},
       false
     )
-    this.setState({currentPage: "createProfile"})
+    this.setState({currentPage: "createProfile", refresh: ++this.state.refresh})
   }
 
   // used on Login page
@@ -775,7 +830,8 @@ class PageSelector extends Component {
       this.api(
         "login",
         {email: this.state.email, password: this.state.password, language: this.state.language}
-      ) 
+      )
+      this.getBabyNames() 
     }
   }
 
@@ -786,7 +842,8 @@ class PageSelector extends Component {
       "logout",
       {email: this.state.email},
       false
-    )     
+    )
+    this.setState({authenticated: false})   
   }
 
   // used on the CreateProfile page
@@ -834,40 +891,105 @@ class PageSelector extends Component {
     this.api(
       "showBabyNames",
       {email: this.state.email},
-      false
+      true,
     )
   }
 
-  // used on the ChooseBabyNames page
-  submitBabyNames() {
-    // handle vote for existing names
-    // TODO
-
-    // handle new names
+  /* used on the ChooseBabyNames */
+  selectBabyName(input) {
+    let selectedBabyNames = this.state.selectedBabyNames
+    if (selectedBabyNames.indexOf(input.target.name) === -1) {
+      selectedBabyNames += input.target.name + ","
+    }
+    else {
+      selectedBabyNames = selectedBabyNames.replace(input.target.name + ",","")
+    }
+    this.setState({selectedBabyNames: selectedBabyNames})
+  }
+  overrideBabyNameWarning() {
+    this.submitBabyNames(true)
+  }
+  submitBabyNames(overrideBabyNameWarning) {
+    overrideBabyNameWarning = overrideBabyNameWarning === true ? true : false
+    let warning = false
+    let warningMessages = this.state.warnings
     let error = false
     let errorMessages = this.state.errors
-    if (!/[-A-Za-z]/.test(this.state.babyName1) && this.state.babyName1 !== "") {
-      errorMessages["babyName1"] = "Please enter a valid name."
+    
+    // handle vote errors for existing names
+    let selectedBabyNames = this.state.selectedBabyNames.split(",")
+    if (selectedBabyNames.length > 5) {
+      errorMessages["selectedBabyNames"] = "Please do not select more than 5 names."
       error = true
     }
-    if (!/[-A-Za-z]/.test(this.state.babyName2) && this.state.babyName2 !== "") {
-      errorMessages["babyName2"] = "Please enter a valid name."
+    else {
+      errorMessages["selectedBabyNames"] = ""
+    }
+
+    // handle new name errors
+    if (/[^A-Za-z-]/.test(this.state.newBabyName1) && this.state.newBabyName1 !== "") {
+      errorMessages["newBabyName1"] = "Please enter a valid name."
       error = true
     }
-    if (!/[-A-Za-z]/.test(this.state.babyName3) && this.state.babyName3 !== "") {
-      errorMessages["babyName3"] = "Please enter a valid name."
+    else if (String(this.state.babyNameList).indexOf(this.state.newBabyName1) > -1) {
+      errorMessages["newBabyName1"] = "This name has already been submitted."
+    }
+    else {
+      errorMessages["newBabyName1"] = ""
+    }
+    if (/[^A-Za-z-]/.test(this.state.newBabyName2) && this.state.newBabyName2 !== "") {
+      errorMessages["newBabyName2"] = "Please enter a valid name."
       error = true
     }
-    if (error) {
-      this.setState({errors: errorMessages})
+    else if (String(this.state.babyNameList).indexOf(this.state.newBabyName1) > -1) {
+      errorMessages["newBabyName2"] = "This name has already been submitted."
+    }
+    else {
+      errorMessages["newBabyName2"] = ""
+    }
+    if (/[^A-Za-z-]/.test(this.state.newBabyName3) && this.state.newBabyName3 !== "") {
+      errorMessages["newBabyName3"] = "Please enter a valid name."
+      error = true
+    }
+    else if (String(this.state.babyNameList).indexOf(this.state.newBabyName1) > -1) {
+      errorMessages["newBabyName3"] = "This name has already been submitted."
+    }
+    else {
+      errorMessages["newBabyName3"] = ""
+    }
+
+    let submit = ""
+    // handle warnings for selected baby names
+    if ((!overrideBabyNameWarning || error) && selectedBabyNames.length < 5) {
+      submit = !error ? "Are you sure you want to continue? Click on submit again to confirm." : ""
+      warningMessages["selectedBabyNames"] = "You can select up to 5 names. " + submit
+      warning = true
+    }
+    else {
+      warningMessages["selectedBabyNames"] = ""
+    }
+
+    // handle warnings for new baby names
+    if ((!overrideBabyNameWarning || error) && (this.state.newBabyName1 === "" || this.state.newBabyName2 === "" || this.state.newBabyName3 === "")) {
+      submit = !error ? "Are you sure you want to continue? Click on submit again to confirm." : ""
+      warningMessages["newBabyNames"] = "You can add up to 3 names to the list. " + submit
+      warning = true
+    }
+    else {
+      warningMessages["newBabyNames"] = "" 
+    }
+
+    if (error || (!overrideBabyNameWarning && warning)) {
+      this.setState({errors: errorMessages, warning: warningMessages, confirmBabyNamesSubmit: error ? false : true})
     }
     else {
       this.api(
-        "submitNewNames",
+        "addBabyNames",
         {
-          babyName1: this.state.babyName1,
-          babyName2: this.state.babyName2,
-          babyName3: this.state.babyName3,
+          newBabyName1: this.state.newBabyName1,
+          newBabyName2: this.state.newBabyName2,
+          newBabyName3: this.state.newBabyName3,
+          selectedBabyNames: this.state.selectedBabyNames
         }
         ,
         false
@@ -883,13 +1005,17 @@ class PageSelector extends Component {
       state[input.target.name] = input.target.checked
     }
     else {
-      state[input.target.name] = input.target.value
+      let value = input.target.value
+      if (input.target.name.indexOf("newBabyName") > -1) {
+        value = value.charAt(0).toUpperCase() + value.slice(1)
+      }
+      state[input.target.name] = value
     }
     this.setState(state)
   }
 
   // API calls
-  api(request,data,spinner = true) {
+  api(request, data, spinner = true) {
     // validate request
     if (typeof data === 'object' && typeof request === "string") {
         if (request.length && typeof data === "object") {
@@ -918,8 +1044,14 @@ class PageSelector extends Component {
                 this.setState({hideBirthday: true})
               }
               // parses birthday into year, month, and day
-              else if (typeof response["birthday"] !== "undefined" && response["birthday"] !== "null") {
+              else if (typeof response.birthday !== "undefined" && response.birthday !== "null") {
                 // TODO
+              }
+              else if (typeof response.babyNames !== "undefined") {
+                let babyNameList = response.babyNames.map(babyNameData => {
+                  return babyNameData.name
+                })
+                this.setState({babyNameList: babyNameList})
               }
               // no error
               if (typeof response.errorMessage === "undefined") {
@@ -1031,10 +1163,16 @@ class PageSelector extends Component {
             email={this.state.email}
             getBabyNames={this.getBabyNames}
             babyNames={this.state.babyNames}
-            newBabyNames={this.state.newBabyNames}
+            newBabyName1={this.state.newBabyName1}
+            newBabyName2={this.state.newBabyName2}
+            newBabyName3={this.state.newBabyName3}
+            selectBabyName={this.selectBabyName}
             selectedBabyNames={this.state.selectedBabyNames}
             storeData={this.storeData}
+            warnings={this.state.warnings}
             errors={this.state.errors}
+            confirmBabyNamesSubmit={this.state.confirmBabyNamesSubmit}
+            overrideBabyNameWarning={this.overrideBabyNameWarning}
             submitBabyNames={this.submitBabyNames}
           />
         )
@@ -1074,7 +1212,6 @@ class PageSelector extends Component {
           {!showHeader ? null :
             <Header
               authenticated={this.state.authenticated}
-              currentPage={this.state.currentPage}
               logout={this.logout}
               headerMessage={headerMessage}
             />
