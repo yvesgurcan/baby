@@ -278,9 +278,11 @@ class ChooseBabyNames extends Component {
       })
     }
     let newBabyNameInput = []
+    const numberOfCols =
+      this.props.maxNewBabyNames % 3 === 0 ? 4 : 6
     for (var i = 1; i <= this.props.maxNewBabyNames; i++) {
       newBabyNameInput.push(
-          <Col key={"newBabyName" + i} sm={4}>
+          <Col key={"newBabyName" + i} sm={numberOfCols}>
             <FormControl
               name={"newBabyName" + i}
               value={this.props.newBabyNames["newBabyName" + i]}
@@ -307,6 +309,15 @@ class ChooseBabyNames extends Component {
           </Col>
           <Clearfix/>
           {
+            !this.props.errors.selectedBabyNames ?
+            null :
+            <Alert
+              bsStyle="danger"
+            >
+              {this.props.errors.selectedBabyNames}
+            </Alert>
+          }
+          {
             !this.props.warnings.selectedBabyNames ?
             null :
             <Alert
@@ -318,7 +329,7 @@ class ChooseBabyNames extends Component {
           }
         </Col>
         <Clearfix/>
-        <hr/>
+        {this.props.maxNewBabyNames > 0 ? <hr/> : null}
         <Col sm={12}>
           {newBabyNameInput}
           <Clearfix/>
@@ -875,7 +886,7 @@ class PageSelector extends Component {
       countryChoices: ["france","usa"],
       relationship: "relative",
       relationshipChoices: ["relative","friend","coworker"],
-      maxNewBabyNames: 3,
+      maxNewBabyNames: 7,
       maxSelectableBabyNames: 5,
       selectedBabyNames: "",
       errors: {},
@@ -1130,7 +1141,6 @@ class PageSelector extends Component {
 
     let submit = ""
     // handle warnings for selected baby names
-    console.log(overrideBabyNameWarning,error,selectedNameCount,selectableNameCount)
     if ((!overrideBabyNameWarning || error) && selectedNameCount < selectableNameCount) {
       
       let nameSelectedMessage =
