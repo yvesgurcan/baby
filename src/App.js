@@ -3,6 +3,32 @@ import {Button, FormControl, Col, Grid, PageHeader, Clearfix, Alert, Row, Checkb
 import $ from 'jquery'
 import './App.css';
 
+/* spinner */
+
+class LocalSpinner extends Component {
+  render () {
+    return (
+      <Col className="text-center">
+          <i className="fa fa-spinner fa-spin" style={{fontSize: "50px"}}/>
+      </Col>
+    )
+  }
+}
+
+class PageSpinner extends Component {
+  render () {
+    return (
+      <Col className="text-center">
+        <div className="spacer-top"/>
+        <div className="spacer-top"/>
+          <i className="fa fa-spinner fa-spin" style={{fontSize: "50px"}}/>
+        <div className="spacer-bottom"/>
+        <div className="spacer-bottom"/>
+      </Col>
+    )
+  }
+}
+
 /* SVGs */
 
 class FrenchFlag extends Component {
@@ -230,13 +256,12 @@ class ShowBabyNameStats extends Component {
 }
 
 class ChooseBabyNames extends Component {
-  constructor(props) {
-    super(props)
-  }
   render() {
-    //
     let babyNames = null
-    if (this.props.babyNames) {
+    if (!this.props.backgroundQueryReady) {
+      babyNames = <LocalSpinner/>
+    }
+    else if (this.props.babyNames) {
       babyNames = this.props.babyNames.map(babyName => {
         return (
           <Button
@@ -251,6 +276,28 @@ class ChooseBabyNames extends Component {
             {babyName.name}
           </Button>)
       })
+    }
+    let newBabyNameInput = []
+    for (var i = 1; i <= this.props.maxNewBabyNames; i++) {
+      newBabyNameInput.push(
+          <Col key={"newBabyName" + i} sm={4}>
+            <FormControl
+              name={"newBabyName" + i}
+              value={this.props.newBabyNames["newBabyName" + i]}
+              bsSize="large"
+              className="margin-bottom"
+              onChange={this.props.storeData}
+            />
+            {
+              !this.props.errors["newBabyName" + i] ?
+              null :
+              <Alert
+              bsStyle="danger">
+              {this.props.errors["newBabyName" + i]}
+              </Alert>
+            }
+          </Col>
+      )
     }
     return (
       <div>
@@ -273,58 +320,7 @@ class ChooseBabyNames extends Component {
         <Clearfix/>
         <hr/>
         <Col sm={12}>
-          <Col sm={4}>
-            <FormControl
-              name="newBabyName1"
-              value={this.props.newBabyName1}
-              bsSize="large"
-              className="margin-bottom"
-              onChange={this.props.storeData}
-            />
-            {
-              !this.props.errors.newBabyName1 ?
-              null :
-              <Alert
-              bsStyle="danger">
-              {this.props.errors.newBabyName1}
-              </Alert>
-            }
-          </Col>
-          <Col sm={4}>
-            <FormControl
-              name="newBabyName2"
-              value={this.props.newBabyName2}
-              bsSize="large"
-              className="margin-bottom"
-              onChange={this.props.storeData}
-            />
-            {
-              !this.props.errors.newBabyName2 ?
-              null :
-              <Alert
-              bsStyle="danger">
-              {this.props.errors.newBabyName2}
-              </Alert>
-            }
-          </Col>
-          <Col sm={4}>
-            <FormControl
-              name="newBabyName3"
-              value={this.props.newBabyName3}
-              bsSize="large"
-              className="margin-bottom"
-              onChange={this.props.storeData}
-            />
-            {
-              !this.props.errors.newBabyName3 ?
-              null :
-              <Alert
-                bsStyle="danger"
-              >
-              {this.props.errors.newBabyName3}
-              </Alert>
-            }
-          </Col>
+          {newBabyNameInput}
           <Clearfix/>
           {
             !this.props.warnings.newBabyNames ?
@@ -351,66 +347,239 @@ class ChooseBabyNames extends Component {
 }
 
 class CreateProfile extends Component {
+  translation() {
+    return {
+      fr: {
+        title: "Crééez votre profile",
+        formLabel: "Veuillez créer votre profil. Cela ne prendra que quelques secondes.",
+        gender: "Sexe",
+        firstname: "Prénom",
+        email: "E-mail",
+        birthday: "Anniversaire",
+        birthdayLabel: {M: "Quand êtes-vous né ?", F:"Quand êtes-vous née ?"},
+        hideBirthday: "Je ne souhaite pas révéler la date de mon anniversaire.",
+        ageCategory: "Tranche d'âge",
+        ageCategoryLabel: "Pourriez-vous indiquer à quelle tranche d'âge vous appartenez ?",
+        country: "Pays",
+        countryLabel: "Dans quel pays résidez-vous ?",
+        relationship: "Relation",
+        relationshipLabel: "Quel est votre lien avec Yves et Ashlee ?",
+      },
+      en: {
+        title: "Create your profile",
+        formLabel: "Please take a few seconds to create your profile.",
+        gender: "Gender",
+        firstname: "Firstname",
+        email: "Email",
+        birthday: "Birthday",
+        birthdayLabel:  {M: "When were you born?", F:"When were you born?"},
+        hideBirthday: "I do not want to disclose my birthday.",
+        ageCategory: "Age Interval",
+        ageCategoryLabel: "Please let us know which age category you belong to.",
+        country: "Country",
+        countryLabel: "Where do you live?",
+        relationship: "Relationship",
+        relationshipLabel: "How do you know Ashlee and Yves?",
+      },
+    }
+  }
+  componentWillMount() {
+    // if necessary, reinstate gender
+    if (this.props.gender !== "M" && this.props.gender !== "F") {
+      this.props.storeData({target: {name: "gender", value: "F"}})
+    }
+    // if necessary, reinstate the default year to the range
+    if (this.props.minYear < this.props.maxYear) {
+      if (this.props.year > this.props.maxYear) {
+        this.props.storeData({target: {name: "year", value: this.props.maxYear}})
+      }
+      else if (this.props.year < this.props.minYear) {
+        this.props.storeData({target: {name: "year", value: this.props.minYear}})
+      }
+    }
+    else {
+      if (this.props.year < this.props.maxYear) {
+        this.props.storeData({target: {name: "year", value: this.props.maxYear}})
+      }
+      else if (this.props.year > this.props.minYear) {
+        this.props.storeData({target: {name: "year", value: this.props.minYear}})
+      }
+    }
+    // if necessary, reinstate the default month to the range
+    const month = {"January":1,"February":2,"March":3,"April":4,"May":5,"June":6,"July":7,"August":8,"September":9,"October":10,"November":11,"December":12}
+    const monthShort = {"Jan":1,"Feb":2,"Mar":3,"Apr":4,"May":5,"Jun":6,"Jul":7,"Aug":8,"Sep":9,"Oct":10,"Nov":11,"Dec":12}
+    if (typeof month[this.props.month] !== "undefined") {
+      this.props.storeData({target: {name: "month", value: month[this.props.month]}})
+    }
+    if (typeof monthShort[this.props.month] !== "undefined") {
+      this.props.storeData({target: {name: "month", value: monthShort[this.props.month]}})
+    }
+    if (this.props.month < 0 || this.props > 12) {
+      this.props.storeData({target: {name: "month", value: 1}})
+    }
+    // if necessary, reinstate the default day to the range
+    const totalDays = new Date(this.props.year, this.props.month, 0).getDate()
+    if (this.props.day < 0 || this.props.day > totalDays) {
+      this.props.storeData({target: {name: "day", value: 1}})
+    }
+    // if necessary, reinstate the default country to the range
+    if (this.props.countryChoices.indexOf(this.props.country) === -1) {
+      this.props.storeData({target: {name: "country", value: this.props.countryChoices[0]}})
+    }
+    // if necessary, reinstate the default relationship to the range
+    if (this.props.relationshipChoices.indexOf(this.props.relationship) === -1) {
+      this.props.storeData({target: {name: "relationship", value: this.props.relationshipChoices[0]}})
+    }
+  }
+  gender() {
+    const genderArray = ["F","M"]
+    const gender = {
+      fr: ["F","Femme","H","Homme"],
+      en: ["F","Female","M","Male"],
+    }
+    let genderOptionsSmall = genderArray.map((g,i) => {
+      return <option key={g} value={g} className="visible-xs">{gender[this.props.language][(i*2)+1]}</option>
+    })
+    let genderOptionsLarge = genderArray.map((g,i) => {
+      return <option key={g} value={g} className="hidden-xs">{gender[this.props.language][(i*2)]}</option>
+    })
+    return {small: genderOptionsSmall, large: genderOptionsLarge}
+  }
   daysOfTheMonth() {
     let days = []
     const totalDays = new Date(this.props.year, this.props.month, 0).getDate()
     // console.log(totalDays)
     for (var i = 1; i <= totalDays; i++) {
-      days.push(<option  key={i} value={i}>{i}</option>)
+      let number = 1
+      if (this.props.language === "fr") {
+        number = i === 1 ? "1er" : i
+      }
+      days.push(<option  key={i} value={i}>{number}</option>)
     }
     return days
   }
   months() {
-    const listOfMonths = ["January","February","March","April","May","June","July","August","September","October","November","December"]
-    let months = listOfMonths.map((month, index) => {
-      return <option key={month} value={index+1}>{month}</option>
+    const listOfMonths = {
+      fr: ["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"],
+      en: ["January","February","March","April","May","June","July","August","September","October","November","December"],
+    }
+    let months = listOfMonths.en.map((month, index) => {
+      return <option key={month} value={index+1}>{listOfMonths[this.props.language][index]}</option>
     })
     return months
   }
   years() {
     let years = []
-    for (var i = 1935; i <= 2010; i++) {
-      years.push(<option key={i} value={i}>{i}</option>)
+    if (this.props.minYear <= this.props.maxYear) {
+      for (var i = this.props.minYear; i <= this.props.maxYear; i++) {
+        years.push(<option key={i} value={i}>{i}</option>)
+      }
+    }
+    else {
+      for (var i = this.props.minYear; i >= this.props.maxYear; i--) {
+        years.push(<option key={i} value={i}>{i}</option>)
+      }
     }
     return years
   }
   ageCategories() {
-    const categories = [{id:"24-",name:"24-"},{id:"25-49",name:"25-49"},{id:"50-74",name:"50-74"},{id:"75+",name:"75+"}]
-    let ageCategories = categories.map((category) => {
+    const categories = {
+      fr: [{id:"24-",name:"24 et moins"},{name:"entre 25 ans et 49 ans",id:"25-49"},{id:"50-74",name:"entre 50 et 74 ans"},{id:"75+",name:"75 ans et plus"}],
+      en: [{id:"24-",name:"24 or younger"},{id:"25-49",name:"between 25 and 49"},{id:"50-74",name:"between 50 and 74"},{id:"75+",name:"75 or older"}],
+    }
+    let ageCategories = categories[this.props.language].map((category) => {
+      // console.log(category)
       return <option key={category.id} value={category.id}>{category.name}</option>
     })
     return ageCategories
   }
   residences() {
-    const countries = [{id:"france",name:"France"},{id:"usa",name:"United States"}]
-    let residence = countries.map((country) => {
-      return <option key={country.id} value={country.id}>{country.name}</option>
+    const countries = {
+      fr: {"france":"France","usa":"Etats-Unis"},
+      en: {"france":"France","usa":"United States"},
+    }
+    let residence = this.props.countryChoices.map((country) => {
+      return <option key={country} value={country}>{countries[this.props.language][country]}</option>
     })
     return residence
   }
   relationships() {
-    const relations = [{id: "relative", name:"Relative"},{id:"friend",name:"Friend"},{id:"coworker",name:"Coworker"}]
-    let relationships = relations.map((relation) => {
-      return <option key={relation.id} value={relation.id}>{relation.name}</option>
+    const relations = {
+      fr: {"relative":"Famille","friend":"Ami","coworker":"Collègue de travail"},
+      en: {"relative":"Relative","friend":"Friend","coworker":"Coworker"},
+    }
+    let relationships = this.props.relationshipChoices.map((relation) => {
+      return <option key={relation} value={relation}>{relations[this.props.language][relation]}</option>
     })
     return relationships
   }
   render() {
+    let box1, box2
+    let dayDropdown = (
+            <Col sm={2}>
+              <FormControl
+                name="day"
+                value={this.props.day}
+                componentClass="select"
+                bsSize="large"
+                className="margin-bottom"
+                onChange={this.props.storeData}
+              >
+                {this.daysOfTheMonth()}
+              </FormControl>
+            </Col>
+    )
+    let monthDropdown = (
+            <Col sm={4}>
+              <FormControl
+                name="month"
+                value={this.props.month}
+                componentClass="select"
+                bsSize="large"
+                className="margin-bottom"
+                onChange={this.props.storeData}
+              >
+                {this.months()}
+              </FormControl>
+            </Col>
+    )
+    if (this.props.language === "fr") {
+      box1 = dayDropdown
+      box2 = monthDropdown
+    }
+    else {
+      box1 = monthDropdown
+      box2 = dayDropdown
+    }
+    let translation = this.translation()[this.props.language]
     return (
       <div>
         <div className="spacer-top-large"/>
         <Col sm={2}>
-          <FormControl
-            name="gender"
-            value={this.props.gender}
-            componentClass="select"
-            bsSize="large"
-            className="margin-bottom"
-            onChange={this.props.storeData}
-          >
-            <option value="F">F</option>
-            <option value="M">M</option>
-          </FormControl>
+          <span className="hidden-xs">
+            <FormControl
+              name="gender"
+              value={this.props.gender}
+              componentClass="select"
+              bsSize="large"
+              className="margin-bottom"
+              onChange={this.props.storeData}
+            >
+            {this.gender().large}
+            </FormControl>
+          </span>
+          <span className="visible-xs">
+            <FormControl
+              name="gender"
+              value={this.props.gender}
+              componentClass="select"
+              bsSize="large"
+              className="margin-bottom"
+              onChange={this.props.storeData}
+            >
+            {this.gender().small}
+            </FormControl>
+          </span>
         </Col>
         <Col sm={5}>
           <FormControl
@@ -438,31 +607,11 @@ class CreateProfile extends Component {
           />
         </Col>
         <Row>
-          {!this.props.hideBirthday ? <Col sm={11}>
-            <Col smOffset={2} sm={2}>
-              <FormControl
-                name="day"
-                value={this.props.day}
-                componentClass="select"
-                bsSize="large"
-                className="margin-bottom"
-                onChange={this.props.storeData}
-              >
-                {this.daysOfTheMonth()}
-              </FormControl>
-            </Col>
-            <Col sm={4}>
-              <FormControl
-                name="month"
-                value={this.props.month}
-                componentClass="select"
-                bsSize="large"
-                className="margin-bottom"
-                onChange={this.props.storeData}
-              >
-                {this.months()}
-              </FormControl>
-            </Col>
+          {!this.props.hideBirthday ?
+          <Col sm={11}>
+            <Col sm={2}></Col>
+            {box1}
+            {box2}
             <Col sm={3}>
               <FormControl
                 name="year"
@@ -478,7 +627,7 @@ class CreateProfile extends Component {
           </Col>
           :
           <Col sm={11}>
-            <Col smOffset={4} sm={4}>
+            <Col smOffset={3} sm={6}>
               <FormControl
                 name="age-category"
                 value={this.props["age-category"]}
@@ -495,15 +644,20 @@ class CreateProfile extends Component {
         </Row>
         <Row className="text-center">
             <Col>
-              <Checkbox
-                name="hideBirthday"
-                checked={this.props.hideBirthday}
-                bsSize="large"
-                className="margin-bottom"
-                onChange={this.props.storeData}
-              />      
-            </Col>        
-        </Row>
+              <label>
+                <Checkbox
+                  inline
+                  name="hideBirthday"
+                  checked={this.props.hideBirthday}
+                  bsSize="large"
+                  className="margin-bottom"
+                  onChange={this.props.storeData}
+                />
+                {translation.hideBirthday}
+              </label>
+            </Col>      
+        </Row> 
+        <Clearfix/> 
         <Col sm={6}>
           <FormControl
             name="country"
@@ -698,7 +852,11 @@ class PageSelector extends Component {
 
     const URLfragments = this.URLfragments()
 
+    var currentYear = new Date()
+    currentYear = currentYear.getFullYear()
+
     // default state
+    // all these values can be modified at will, the App should handle gracefully any unexpected value
     this.state = {
       language: URLfragments.language === "fr" ? "fr" : "en",
       email: URLfragments.email ? URLfragments.email : "",
@@ -707,26 +865,29 @@ class PageSelector extends Component {
       password: "",
       gender: "F",
       day: 1,
-      month: 1,
+      month: "January",
       year: 1960,
+      minYear: Math.floor((currentYear - 80) / 5) * 5,
+      maxYear: Math.ceil((currentYear - 15) / 5) * 5,
       hideBirthday: false,
       "age-category": "50-74",
-      country: "france",
+      country: "www",
+      countryChoices: ["france","usa"],
       relationship: "relative",
-      newBabyName1: "",
-      newBabyName2: "",
-      newBabyName3: "",
+      relationshipChoices: ["relative","friend","coworker"],
+      maxNewBabyNames: 3,
+      maxSelectableBabyNames: 5,
       selectedBabyNames: "",
       errors: {},
       warnings: {},
       ready: true,
+      backgroundQueryReady: true,
     }
 
-  }
+    for (var i = 1; i <= this.state.maxNewBabyNames; i++) {
+      this.state["newBabyName" + i] = ""
+    }
 
-  componentDidMount() {
-    const URLfragments = this.URLfragments()
-    this.api("auto-login", {email: URLfragments.email ? URLfragments.email : this.state.email}, false)
   }
 
   /* get optional user language, email, and name from URL when component mounts */
@@ -762,6 +923,25 @@ class PageSelector extends Component {
       language: language,
       email: email,
       name: name,
+    }
+  }
+
+  // used on first load
+  // maintain user session if still authenticated and load baby names silently
+  componentDidMount() {
+    if (this.state.currentPage === "login") {
+      const URLfragments = this.URLfragments()
+      let that = this
+      // wait a millisecond to receive auto-fill input from the user's browser
+      setTimeout(
+        function() {
+          that.api(
+            "auto-login",
+            {email: URLfragments.email ? URLfragments.email : that.state.email},
+            true)
+          that.state.email !== "" ? that.getBabyNames() : null
+        },
+        1)
     }
   }
 
@@ -831,7 +1011,8 @@ class PageSelector extends Component {
         "login",
         {email: this.state.email, password: this.state.password, language: this.state.language}
       )
-      this.getBabyNames() 
+      // also silently load baby names
+      this.getBabyNames()
     }
   }
 
@@ -891,7 +1072,7 @@ class PageSelector extends Component {
     this.api(
       "showBabyNames",
       {email: this.state.email},
-      true,
+      "backgroundQuerySpinner",
     )
   }
 
@@ -916,10 +1097,13 @@ class PageSelector extends Component {
     let error = false
     let errorMessages = this.state.errors
     
-    // handle vote errors for existing names
+    let selectableNameCount = Math.min(this.state.maxSelectableBabyNames,this.state.nameCount)
     let selectedBabyNames = this.state.selectedBabyNames.split(",")
-    if (selectedBabyNames.length > 5) {
-      errorMessages["selectedBabyNames"] = "Please do not select more than 5 names."
+    let selectedNameCount = this.state.selectedBabyNames === "" ? 0 : selectedBabyNames.length - 1
+
+    // handle vote errors for existing names
+    if (selectedNameCount > selectableNameCount) {
+      errorMessages["selectedBabyNames"] = "Please do not select more than " + selectableNameCount + " names."
       error = true
     }
     else {
@@ -927,42 +1111,37 @@ class PageSelector extends Component {
     }
 
     // handle new name errors
-    if (/[^A-Za-z-]/.test(this.state.newBabyName1) && this.state.newBabyName1 !== "") {
-      errorMessages["newBabyName1"] = "Please enter a valid name."
-      error = true
-    }
-    else if (String(this.state.babyNameList).indexOf(this.state.newBabyName1) > -1) {
-      errorMessages["newBabyName1"] = "This name has already been submitted."
-    }
-    else {
-      errorMessages["newBabyName1"] = ""
-    }
-    if (/[^A-Za-z-]/.test(this.state.newBabyName2) && this.state.newBabyName2 !== "") {
-      errorMessages["newBabyName2"] = "Please enter a valid name."
-      error = true
-    }
-    else if (String(this.state.babyNameList).indexOf(this.state.newBabyName1) > -1) {
-      errorMessages["newBabyName2"] = "This name has already been submitted."
-    }
-    else {
-      errorMessages["newBabyName2"] = ""
-    }
-    if (/[^A-Za-z-]/.test(this.state.newBabyName3) && this.state.newBabyName3 !== "") {
-      errorMessages["newBabyName3"] = "Please enter a valid name."
-      error = true
-    }
-    else if (String(this.state.babyNameList).indexOf(this.state.newBabyName1) > -1) {
-      errorMessages["newBabyName3"] = "This name has already been submitted."
-    }
-    else {
-      errorMessages["newBabyName3"] = ""
+    let emptyNewBabyNames = 0
+    for (var i = 1; i <= this.state.maxNewBabyNames; i++) {
+      if (this.state["newBabyName" + i] === "") {
+        emptyNewBabyNames++
+      }
+      else if (/[^A-Za-z-]/.test(this.state["newBabyName" + i])) {
+        errorMessages["newBabyName" + i] = "Please enter a valid name."
+        error = true
+      }
+      else if (String(this.state.babyNameList).indexOf(this.state["newBabyName" + i]) > -1) {
+        errorMessages["newBabyName" + i] = "This name has already been submitted."
+      }
+      else {
+        errorMessages["newBabyName1" + i] = ""
+      }
     }
 
     let submit = ""
     // handle warnings for selected baby names
-    if ((!overrideBabyNameWarning || error) && selectedBabyNames.length < 5) {
+    console.log(overrideBabyNameWarning,error,selectedNameCount,selectableNameCount)
+    if ((!overrideBabyNameWarning || error) && selectedNameCount < selectableNameCount) {
+      
+      let nameSelectedMessage =
+        selectedNameCount === 0
+        ? "You have not selected any name "
+        : selectedNameCount === 1
+        ? "You have selected only 1 name "
+        : "You have selected only " + selectedNameCount + " names ";
+
       submit = !error ? "Are you sure you want to continue? Click on submit again to confirm." : ""
-      warningMessages["selectedBabyNames"] = "You can select up to 5 names. " + submit
+      warningMessages["selectedBabyNames"] = nameSelectedMessage + " (max is " + selectableNameCount + " names). " + submit
       warning = true
     }
     else {
@@ -971,8 +1150,17 @@ class PageSelector extends Component {
 
     // handle warnings for new baby names
     if ((!overrideBabyNameWarning || error) && (this.state.newBabyName1 === "" || this.state.newBabyName2 === "" || this.state.newBabyName3 === "")) {
+      let newNamesCount = this.state.maxNewBabyNames - emptyNewBabyNames
+      let nameEnteredMessage =
+        newNamesCount === 0
+          ? ""
+          : newNamesCount === 1
+          ? "You have entered only 1 new name. " 
+          : "You have entered only " + newNamesCount + " new names. "
+
+
       submit = !error ? "Are you sure you want to continue? Click on submit again to confirm." : ""
-      warningMessages["newBabyNames"] = "You can add up to 3 names to the list. " + submit
+      warningMessages["newBabyNames"] = nameEnteredMessage + "You can add up to " + this.state.maxNewBabyNames + " names to the list. " + submit
       warning = true
     }
     else {
@@ -983,18 +1171,18 @@ class PageSelector extends Component {
       this.setState({errors: errorMessages, warning: warningMessages, confirmBabyNamesSubmit: error ? false : true})
     }
     else {
+      var requestObject = {}
+      for (var i = 1; i <= this.state.maxNewBabyNames; i++) {
+        requestObject["newBabyName" + i] = this.state["newBabyName" + i]
+      }
+      requestObject.newBabyNameCount = this.state.maxNewBabyNames
+      requestObject.selectedBabyNames = this.state.selectedBabyNames
+      requestObject.gender = this.state.gender
+      requestObject.country = this.state.country
+      requestObject.relationship = this.state.relationship
       this.api(
         "addBabyNames",
-        {
-          newBabyName1: this.state.newBabyName1,
-          newBabyName2: this.state.newBabyName2,
-          newBabyName3: this.state.newBabyName3,
-          selectedBabyNames: this.state.selectedBabyNames,
-          gender: this.state.gender,
-          country: this.state.country,
-          relationship: this.state.relationship,
-        }
-        ,
+        requestObject,
         false
       )
     }
@@ -1002,8 +1190,8 @@ class PageSelector extends Component {
 
   // used by forms
   storeData(input) {
+    console.log(input.target)
     let state = this.state
-    // console.log(input.target)
     if (input.target.type === "checkbox") {
       state[input.target.name] = input.target.checked
     }
@@ -1025,11 +1213,14 @@ class PageSelector extends Component {
         data.request = request
         console.log("Request sent.","\nData: ",data)
         // trigger spinner
-        if (spinner) {
+        if (spinner === "backgroundQuerySpinner") {
+          this.setState({backgroundQueryReady:false})
+        }
+        else if (spinner) {
           this.setState({ready:false})
         }
         // clear errors
-        this.setState({errors: {}})
+        this.setState({errors: {}, serverError: null})
         $.ajax({
           url: "https://bu67qviz40.execute-api.us-west-2.amazonaws.com/prod",
           data: data,
@@ -1038,7 +1229,12 @@ class PageSelector extends Component {
           context: this,
           header: {'Access-Control-Allow-Origin':'*'},
           success: function(response) {
-            this.setState({ready:true})
+            if (spinner === "backgroundQuerySpinner") {
+              this.setState({backgroundQueryReady:true})
+            }
+            else if (spinner) {
+              this.setState({ready:true})
+            }
             if (response != null && typeof response === "object") {
               // saves response in the state
               this.setState(response)
@@ -1106,6 +1302,7 @@ class PageSelector extends Component {
     let showFooter = true
     let currentPage = null
     let headerMessage = ""
+    // debug capabilities to work on a specific page
     // chooses appropriate page to show
     switch (this.state.currentPage) {
       default:
@@ -1117,6 +1314,7 @@ class PageSelector extends Component {
             language={this.state.language}
             switchLanguage={this.switchLanguage}
             goToLogin={this.goToLogin}
+            email={this.state.email}
           />
         )
         break
@@ -1149,10 +1347,14 @@ class PageSelector extends Component {
             day={this.state.day}
             month={this.state.month}
             year={this.state.year}
+            minYear={this.state.minYear}
+            maxYear={this.state.maxYear}
             hideBirthday={this.state.hideBirthday}
             age-category={this.state["age-category"]}
             country={this.state.country}
+            countryChoices={this.state.countryChoices}
             relationship={this.state.relationship}
+            relationshipChoices={this.state.relationshipChoices}
             storeData={this.storeData}
             errors={this.state.errors}
             submitProfile={this.submitProfile}
@@ -1160,23 +1362,26 @@ class PageSelector extends Component {
         )
         break
       case "chooseBabyNames":
+        var newBabyNames = {}
+        for (var i = 1; i <= this.state.maxNewBabyNames; i++) {
+          newBabyNames["newBabyName" + i] = this.state["newBabyName" + i]
+        }
         currentPage = (
           <ChooseBabyNames
             language={this.state.language}
             email={this.state.email}
-            getBabyNames={this.getBabyNames}
             babyNames={this.state.babyNames}
-            newBabyName1={this.state.newBabyName1}
-            newBabyName2={this.state.newBabyName2}
-            newBabyName3={this.state.newBabyName3}
             selectBabyName={this.selectBabyName}
             selectedBabyNames={this.state.selectedBabyNames}
+            maxNewBabyNames={this.state.maxNewBabyNames}
+            newBabyNames={newBabyNames}
+            submitBabyNames={this.submitBabyNames}
+            confirmBabyNamesSubmit={this.state.confirmBabyNamesSubmit}
+            overrideBabyNameWarning={this.overrideBabyNameWarning}
             storeData={this.storeData}
             warnings={this.state.warnings}
             errors={this.state.errors}
-            confirmBabyNamesSubmit={this.state.confirmBabyNamesSubmit}
-            overrideBabyNameWarning={this.overrideBabyNameWarning}
-            submitBabyNames={this.submitBabyNames}
+            backgroundQueryReady={this.state.backgroundQueryReady}
           />
         )
         break
@@ -1192,15 +1397,7 @@ class PageSelector extends Component {
 
     // spinner
     if (!this.state.ready) {
-      currentPage = (
-        <Col className="text-center">
-          <div className="spacer-top"/>
-          <div className="spacer-top"/>
-            <i className="fa fa-spinner fa-spin" style={{fontSize: "50px"}}/>
-         <div className="spacer-bottom"/>
-         <div className="spacer-bottom"/>
-        </Col>
-      )
+      currentPage = <PageSpinner/>
     }
 
     return (
