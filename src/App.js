@@ -508,6 +508,12 @@ class CreateProfile extends Component {
     return relationships
   }
   render() {
+    let disabled =
+      this.props.profileComplete && this.props.admin !== true
+      ? true
+      : false
+    let translation = this.translation()[this.props.language]
+    // reverse order of day and month depending on language
     let box1, box2
     let dayDropdown = (
             <Col sm={3}>
@@ -545,7 +551,6 @@ class CreateProfile extends Component {
       box1 = monthDropdown
       box2 = dayDropdown
     }
-    let translation = this.translation()[this.props.language]
     return (
       <div>
         <div className="spacer-top-large"/>
@@ -597,8 +602,8 @@ class CreateProfile extends Component {
         </Col>
         <Col sm={5}>
           <FormControl
-            disabled={true}
-            value={this.props.email}
+            disabled={this.props.admin === true && this.props.profileComplete ? false : true}
+            value={this.props.email ? this.props.email : ""}
             bsSize="large"
             className="margin-bottom"
           />
@@ -749,7 +754,7 @@ class Login extends Component {
           <FormControl
             name="email"
             type="email"
-            value={this.props.email}
+            value={this.props.email ? this.props.email : ""}
             bsSize="large"
             className="margin-bottom"
             onChange={this.props.storeData}
@@ -864,6 +869,7 @@ class PageSelector extends Component {
     this.selectBabyName = this.selectBabyName.bind(this)
     this.overrideBabyNameWarning = this.overrideBabyNameWarning.bind(this)
     this.submitBabyNames = this.submitBabyNames.bind(this)
+    this.sortBabyNames = this.sortBabyNames.bind(this)
     this.storeData = this.storeData.bind(this)
     this.api = this.api.bind(this)    
 
@@ -881,7 +887,7 @@ class PageSelector extends Component {
     // see top of this page to customize the state of the App
     let defaultUserState = defaultState
     defaultUserState.language = language
-    defaultUserState.email = URLfragments.email ? URLfragments.email : ""
+    defaultUserState.email = URLfragments.email ? URLfragments.email : null
     defaultUserState.name = URLfragments.name ? URLfragments.name : ""
     defaultUserState.currentPage = URLfragments.language ? "login" : null
     defaultUserState.errors = {}
@@ -1117,12 +1123,7 @@ class PageSelector extends Component {
 
   // used on Announcement page
   goToNewProfilePage() {
-    this.api(
-      "goToCreateProfile",
-      {email: this.state.email},
-      false
-    )
-    this.setState({currentPage: "createProfile", refresh: ++this.state.refresh})
+    this.setState({currentPage: "createProfile"})
   }
 
   // used on Login page
@@ -1175,9 +1176,10 @@ class PageSelector extends Component {
       {email: this.state.email},
       false
     )
-    this.setState({
-      authenticated: false
-    })   
+    let defaultUserState = defaultState
+    defaultUserState["authenticated"] = false
+    this.setState(defaultUserState)
+    delete this.state.admin
   }
 
   // used on the CreateProfile page
@@ -1345,6 +1347,11 @@ class PageSelector extends Component {
     }
   }
 
+  // used by showBabyNameStats
+  sortBabyNames() {
+    // TODO
+  }
+
   // used by forms
   storeData(input) {
     let state = this.state
@@ -1353,7 +1360,7 @@ class PageSelector extends Component {
     }
     else {
       let value = input.target.value
-      if (input.target.name.indexOf("newBabyName") > -1) {
+      if (input.target.name.indexOf("newBabyName") > -1 || input.target.name.indexOf("name") > -1) {
         value = value.charAt(0).toUpperCase() + value.slice(1)
       }
       state[input.target.name] = value
@@ -1380,7 +1387,7 @@ class PageSelector extends Component {
           this.setState({ready:false})
         }
         // clear errors
-        this.setState({errors: {}, serverError: null})
+        this.setState({errors: {}, errorMessage: ""})
         $.ajax({
           type: "GET",
           url: "https://bu67qviz40.execute-api.us-west-2.amazonaws.com/prod",
@@ -1535,6 +1542,8 @@ class PageSelector extends Component {
             storeData={this.storeData}
             errors={this.state.errors}
             submitProfile={this.submitProfile}
+            profileComplete={this.state.profileComplete}
+            admin={this.state.admin}
           />
         )
         break
