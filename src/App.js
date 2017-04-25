@@ -241,16 +241,36 @@ class OrangeMushroom extends Component {
 /* page layout */
 
 class Header extends Component {
+  constructor(props) {
+    super(props)
+
+    this.translation = this.translation.bind(this)
+  }
+  translation() {
+    return {
+      fr: {welcome: "Bienvenue !"},
+      en: {welcome: "Welcome!"}
+    }
+  }
   render() {
+    let translation = this.translation()[this.props.language]
+    let links = "lol"
     return (
       <div>
         <Col xs={2} style={{marginTop: "5px", marginLeft: "-25px",padding: "0px"}} >
             <GreenMushroom header/>
         </Col>
+        {this.props.currentPage !== "login"
+        ? null
+        :
         <Col xs={8} style={{marginTop: "10px"}} className="text-center">
-          <div className="override-default"><PageHeader>{this.props.headerMessage}</PageHeader></div>
+          <div className="override-default">
+            <PageHeader>{translation.welcome}</PageHeader>
+          </div>
         </Col>
-        <Col xs={2}  style={{marginTop: "22.5px", paddingRight: "0px"}} className="text-right">
+        }
+        <Col xs={this.props.currentPage !== "login" ? 10 : 2}  style={{marginTop: "22.5px", paddingRight: "0px"}} className="text-right">
+          {links}
           <a className="logout" hidden={!this.props.authenticated} onClick={this.props.logout}>Logout</a>
         </Col>
         <Clearfix/>
@@ -266,6 +286,7 @@ class Footer extends Component {
       <Flags
         switchLanguage={this.props.switchLanguage}
         submitLanguageShift={this.props.submitLanguageShift}
+        loginSwitchLanguage={this.props.loginSwitchLanguage}
       />
     )
   }
@@ -830,13 +851,13 @@ class Flags extends Component {
             <Clearfix/>
             <span
               onMouseOver={this.switchLanguage} 
-              onClick={this.props.submitLanguageShift ? this.props.submitLanguageShift : this.props.goToLogin}
+              onClick={this.props.loginSwitchLanguage ? this.props.loginSwitchLanguage : this.props.submitLanguageShift ? this.props.submitLanguageShift : this.props.goToLogin}
             >
               <AmericanFlag mainPage={this.props.mainPage} />
             </span>
             <span
               onMouseOver={this.switchLanguage}
-              onClick={this.props.submitLanguageShift ? this.props.submitLanguageShift : this.props.goToLogin}
+              onClick={this.props.loginSwitchLanguage ? this.props.loginSwitchLanguage : this.props.submitLanguageShift ? this.props.submitLanguageShift : this.props.goToLogin}
             >
               <FrenchFlag mainPage={this.props.mainPage}/>
             </span>            
@@ -859,6 +880,7 @@ class PageSelector extends Component {
 
     this.URLfragments = this.URLfragments.bind(this)
     this.switchLanguage = this.switchLanguage.bind(this)
+    this.loginSwitchLanguage = this.loginSwitchLanguage.bind(this)
     this.submitLanguageShift = this.submitLanguageShift.bind(this)
     this.goToLogin = this.goToLogin.bind(this)
     this.goToNewProfilePage = this.goToNewProfilePage.bind(this)
@@ -1104,6 +1126,13 @@ class PageSelector extends Component {
   /* used on Flags component */
   switchLanguage(language) {
     this.setState({language: language})
+  }
+  loginSwitchLanguage(input) {
+    let language = input.target.id
+    if (language === "") {
+      language = $(input.target).closest('svg').attr('id')
+    }
+    this.switchLanguage(language)
   }
   submitLanguageShift() {
     this.api(
@@ -1596,9 +1625,11 @@ class PageSelector extends Component {
           {/* header */}
           {!showHeader ? null :
             <Header
+              language={this.state.language}
               authenticated={this.state.authenticated}
-              logout={this.logout}
               headerMessage={headerMessage}
+              currentPage={this.state.currentPage}
+              logout={this.logout}
             />
           }
           {/* API error feedback */}
@@ -1615,6 +1646,7 @@ class PageSelector extends Component {
             <Footer
               switchLanguage={this.switchLanguage}
               submitLanguageShift={this.submitLanguageShift}
+              loginSwitchLanguage={this.state.currentPage === "login" ? this.loginSwitchLanguage : null}
             />
           }
         </Col>
