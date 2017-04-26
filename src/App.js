@@ -804,7 +804,7 @@ class Login extends Component {
             null :
             <Alert
             bsStyle="danger">
-            {this.props.errors.email}
+            {this.props.errors.email[this.props.language]}
             </Alert>
           }
           <FormControl
@@ -819,7 +819,7 @@ class Login extends Component {
             null :
             <Alert
             bsStyle="danger">
-            {this.props.errors.password}
+            {this.props.errors.password[this.props.language]}
             </Alert>
           }
           <Button
@@ -1185,23 +1185,29 @@ class PageSelector extends Component {
     // validates user's email
     if (this.state.email.length === 0) {
       error = true
-      errorMessages["email"] = "Please enter your email address."
+      errorMessages.email = {}
+      errorMessages.email.en = "Please enter your email address."
+      errorMessages.email.fr = "Veuillez entre votre adresse email." 
     }
     else if (!/^[\w._-]+[+]?[\w._-]+@[\w.-]+\.[a-zA-Z]{2,6}$/.test(this.state.email)) {
       error = true
-      errorMessages["email"] = "Please enter a valid email address."      
+      errorMessages.email = {}
+      errorMessages.email.en = "Please enter a valid email address."
+      errorMessages.email.fr = "Veuillez entre une adresse email valide."         
     }
     else {
-      errorMessages["email"] = ""
+      errorMessages.email = ""
     }
 
     // validates password
     if (password.length === 0) {
       error = true
-      errorMessages["password"] = "Please enter the password."
+      errorMessages.password = {}
+      errorMessages.password.en = "Please enter the password."
+      errorMessages.password.fr = "Veuillez entrer le mot de passe."
     }
     else {
-      errorMessages["password"] = ""
+      errorMessages.password = ""
     }
 
     if (error) {
@@ -1438,7 +1444,7 @@ class PageSelector extends Component {
           this.setState({ready:false})
         }
         // clear errors
-        this.setState({errors: {}, errorMessage: ""})
+        this.setState({errors: {}, errorMessage: "", userInfo: ""})
         $.ajax({
           type: "GET",
           url: "https://bu67qviz40.execute-api.us-west-2.amazonaws.com/prod",
@@ -1658,11 +1664,17 @@ class PageSelector extends Component {
           }
           {/* User info message */}
           {!this.state.userInfo ? null :
-            <Alert bsStyle="info">{this.state.userInfo}</Alert>
+            <Alert bsStyle="info">{this.state.userInfo[this.state.language]}</Alert>
           }
           {/* API error feedback */}
           {!this.state.errorMessage ? null :
-            <Alert bsStyle="danger">{this.state.errorMessage}</Alert>
+            <Alert bsStyle="danger">
+            {
+              this.state.errorMessage[this.state.language]
+              ? this.state.errorMessage[this.state.language]
+              : this.state.errorMessage
+            }
+            </Alert>
           }
           {/* page main content */}
           
