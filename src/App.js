@@ -1632,6 +1632,10 @@ class PageSelector extends Component {
               logout={this.logout}
             />
           }
+          {/* User info message */}
+          {!this.state.userInfo ? null :
+            <Alert bsStyle="info">{this.state.userInfo}</Alert>
+          }
           {/* API error feedback */}
           {!this.state.errorMessage ? null :
             <Alert bsStyle="danger">{this.state.errorMessage}</Alert>
