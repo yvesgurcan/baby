@@ -33,9 +33,9 @@ html, body {
 
 .margin-right {
   margin-right: 10px;
-}
+}   
 
-.logout {
+.menu-link {
   cursor: pointer !important;
 }
 
