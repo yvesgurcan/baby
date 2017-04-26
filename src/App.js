@@ -16,7 +16,7 @@ const defaultState = {
       year: 500,
       minYear: Math.floor((currentYear - 100) / 5) * 5,
       maxYear: Math.ceil((currentYear - 2000) / 5) * 5,
-      hideBirthday: "xxx",
+      hideBirthday: false,
       "age-category": "99-74",
       ageCategoryChoices: ["24-","25-49","50-74","75+"],
       country: "www",
@@ -266,9 +266,6 @@ class Header extends Component {
   }
   render() {
     let translation = this.translation()[this.props.language]
-    let announcement = true
-    let createProfile = true
-    let babyNames = true
     return (
       <div>
         <Col xs={2} style={{marginTop: "5px", marginLeft: "-25px",padding: "0px"}} >
@@ -285,9 +282,22 @@ class Header extends Component {
         }
         {!this.props.authenticated ? null :
         <Col xs={10}  style={{marginTop: "22.5px", paddingRight: "0px"}} className="text-right">
-          {!announcement ? null : <span><a id="announcement" className="menu-link" onClick={this.props.switchCurrentPage}>{translation.announcement}</a> | </span>}
-          {!createProfile ? null : <span><a id="createProfile" className="menu-link" onClick={this.props.switchCurrentPage}>{translation.createProfile}</a> | </span>}
-          {!babyNames ? null : <span><a id="chooseBabyNames" className="menu-link" onClick={this.props.switchCurrentPage}>{translation.chooseBabyNames}</a> | </span>}
+          <span><a id="announcement" className="menu-link" onClick={this.props.switchCurrentPage}>{translation.announcement}</a> | </span>
+          {
+            (!this.props.authenticated || !this.props.firstLogin || this.props.currentPage === "createProfile")
+              ? <span><a id="createProfile" className="menu-link" onClick={this.props.switchCurrentPage}>{translation.createProfile}</a> | </span>
+              : null
+          }
+          {
+            (!this.props.authenticated || (this.props.profileComplete && !this.props.voted))
+            ? <span><a id="chooseBabyNames" className="menu-link" onClick={this.props.switchCurrentPage}>{translation.chooseBabyNames}</a> | </span>
+            : null
+          }
+          {
+            (!this.props.authenticated || (this.props.profileComplete && this.props.voted))
+            ? <span><a id="showBabyNameStats" className="menu-link" onClick={this.props.switchCurrentPage}>{translation.chooseBabyNames}</a> | </span>
+            : null
+          }
           {!this.props.authenticated ? null : <span><a className="menu-link" onClick={this.props.logout}>{translation.logout}</a></span>}
         </Col>
         }
@@ -440,6 +450,7 @@ class CreateProfile extends Component {
         countryLabel: "Dans quel pays résidez-vous ?",
         relationship: "Relation",
         relationshipLabel: "Quel est votre lien avec Yves et Ashlee ?",
+        createProfile: "Créer votre profil",
       },
       en: {
         title: "Create your profile",
@@ -456,6 +467,7 @@ class CreateProfile extends Component {
         countryLabel: "Where do you live?",
         relationship: "Relationship",
         relationshipLabel: "How do you know Ashlee and Yves?",
+        createProfile: "Create Profile",
       },
     }
   }
@@ -603,6 +615,7 @@ class CreateProfile extends Component {
               className="margin-bottom"
               onChange={this.props.storeData}
               onKeyPress={this.autoSubmitForm}
+              disabled={this.props.profileComplete && this.props.admin !== true ? true : false}
             >
             {this.gender().large}
             </FormControl>
@@ -616,6 +629,7 @@ class CreateProfile extends Component {
               className="margin-bottom"
               onChange={this.props.storeData}
               onKeyPress={this.autoSubmitForm}
+              disabled={this.props.profileComplete && this.props.admin !== true ? true : false}
             >
             {this.gender().small}
             </FormControl>
@@ -629,19 +643,20 @@ class CreateProfile extends Component {
             className="margin-bottom"
             onChange={this.props.storeData}
             onKeyPress={this.autoSubmitForm}
+            disabled={this.props.profileComplete && this.props.admin !== true ? true : false}
           />
           {
             !this.props.errors.name ?
             null :
             <Alert
             bsStyle="danger">
-            {this.props.errors.name}
+            {this.props.errors.name[this.props.language]}
             </Alert>
           }
         </Col>
         <Col sm={5}>
           <FormControl
-            disabled={this.props.admin === true && this.props.profileComplete ? false : true}
+            disabled={this.props.admin === true ? false : true}
             value={this.props.email ? this.props.email : ""}
             bsSize="large"
             className="margin-bottom"
@@ -662,6 +677,7 @@ class CreateProfile extends Component {
                 className="margin-bottom"
                 onChange={this.props.storeData}
                 onKeyPress={this.autoSubmitForm}
+                disabled={this.props.profileComplete && this.props.admin !== true ? true : false}
               >
                 {this.years()}
               </FormControl>
@@ -678,6 +694,7 @@ class CreateProfile extends Component {
                 className="margin-bottom"
                 onChange={this.props.storeData}
                 onKeyPress={this.autoSubmitForm}
+                disabled={this.props.profileComplete && this.props.admin !== true ? true : false}
               >
                 {this.ageCategories()}
               </FormControl>
@@ -696,6 +713,7 @@ class CreateProfile extends Component {
                   className="margin-bottom"
                   onChange={this.props.storeData}
                   onKeyPress={this.autoSubmitForm}
+                  disabled={this.props.profileComplete && this.props.admin !== true ? true : false}
                 />
                 {translation.hideBirthday}
               </label>
@@ -711,6 +729,7 @@ class CreateProfile extends Component {
             className="margin-bottom"
             onChange={this.props.storeData}
             onKeyPress={this.autoSubmitForm}
+            disabled={this.props.profileComplete && this.props.admin !== true ? true : false}
           >
             {this.residences()}
           </FormControl>
@@ -724,19 +743,26 @@ class CreateProfile extends Component {
             className="margin-bottom"
             onChange={this.props.storeData}
             onKeyPress={this.autoSubmitForm}
+            disabled={this.props.profileComplete && this.props.admin !== true ? true : false}
           >
             {this.relationships()}
           </FormControl>
         </Col>
-
-        <Col sm={12}>
-          <Button
-            block
-            bsSize="large"
-            bsStyle="primary"
-            onClick={this.props.submitProfile}
-          >Create Profile</Button>
+        {
+          this.props.profileComplete && this.props.admin !== true
+          ? null
+          : 
+          <Col sm={12}>
+            <Button
+              block
+              bsSize="large"
+              bsStyle="primary"
+              onClick={this.props.submitProfile}
+            >
+              {translation.createProfile}
+            </Button>
         </Col>
+        }
         <div className="spacer-bottom-large"/>
         <div className="spacer-bottom-large"/>
       </div>
@@ -745,7 +771,18 @@ class CreateProfile extends Component {
 }
 
 class Announcement extends Component {
+  constructor(props) {
+    super(props)
+    this.translation = this.translation.bind(this)
+  }
+  translation() {
+    return {
+      fr: {next: "Wouhou !"},
+      en: {next: "Woohoo!"},
+    }
+  }
   render() {
+    let translation = this.translation()[this.props.language]
     return (
       <Col sm={12}>
         <div className="spacer-top"/>
@@ -754,12 +791,14 @@ class Announcement extends Component {
           <GreenMushroom/>
           <OrangeMushroom/>
         </svg>
-        <Button
-          block
-          bsSize="large"
-          bsStyle="primary"
-          onClick={this.props.goToNewProfilePage}
-        >Yes!</Button>
+        {!this.props.firstLogin ? null :
+          <Button
+            block
+            bsSize="large"
+            bsStyle="primary"
+            onClick={this.props.goToNewProfilePage}
+          >{translation.next}</Button>
+        }
         <div className="spacer-bottom"/>
         <div className="spacer-bottom"/>
       </Col>
@@ -772,6 +811,13 @@ class Login extends Component {
     super(props)
     this.autoSubmitForm = this.autoSubmitForm.bind(this)
     this.login = this.login.bind(this)
+    this.translation = this.translation.bind(this)
+  }
+  translation() {
+    return {
+      fr: {login: "Connexion"},
+      en: {login: "Log in"},
+    }
   }
   login() {
     this.props.login($("[name=password]").val())
@@ -782,6 +828,7 @@ class Login extends Component {
     }
   }
   render() {
+    let translation = this.translation()[this.props.language]
     return (
         <Col
           lg={8} lgOffset={2} 
@@ -828,7 +875,9 @@ class Login extends Component {
             bsSize="large"
             className="margin-bottom"
             onClick={this.login}
-          >Enter</Button>
+          >
+            {translation.login}
+          </Button>
           <div className="spacer-bottom"/>
           <div className="spacer-bottom"/>
         </Col>
@@ -931,6 +980,7 @@ class PageSelector extends Component {
     defaultUserState.email = URLfragments.email ? URLfragments.email : null
     defaultUserState.name = URLfragments.name ? URLfragments.name : ""
     defaultUserState.currentPage = URLfragments.language ? "login" : null
+    defaultUserState.selectedBabyNames = ""
     defaultUserState.errors = {}
     defaultUserState.warnings =  {}
     defaultUserState.ready = true
@@ -1126,6 +1176,12 @@ class PageSelector extends Component {
       console.warn("Invalid relationship '" + this.state.relationship + "' was replaced by fallback '" + fallback + "'.")
     }
 
+    // check authentication, prevent to browse beyond login page
+    // note: this is not a very secure method, as setting the state of authenticated to true manually  would override the statement below
+    if (!this.state.authenticated && this.state.currentPage !== "login" && this.state.currentPage !== null) {
+      this.storeRawData({currentPage: "login"})
+    }
+
     // prevent changes on maxBabyNames
     if (this.state.maxNewBabyNames !== test.defaultUserStateMaxNewBabyNames) {
       fallback = test.defaultUserStateMaxNewBabyNames
@@ -1175,6 +1231,8 @@ class PageSelector extends Component {
   }
   switchCurrentPage(input) {
     this.setState({currentPage: input.target.id})
+    delete this.state.userInfo
+    delete this.state.errorMessage
   }
 
   // used on Login page
@@ -1237,6 +1295,9 @@ class PageSelector extends Component {
     defaultUserState["authenticated"] = false
     this.setState(defaultUserState)
     delete this.state.admin
+    delete this.state.firstLogin
+    delete this.state.voted
+    delete this.state.profileComplete
   }
 
   // used on the CreateProfile page
@@ -1245,12 +1306,15 @@ class PageSelector extends Component {
     let errorMessages = this.state.errors
 
     // validates user's name
-    if (this.state.name.length === 0) {
+    if (this.state.name.length === 0
+    || /[^A-Za-zàâäèéêëîïôœùûüÿçÀÂÄÈÉÊËÎÏÔŒÙÛÜŸÇ -]/.test(this.state.name)) {
       error = true
-      errorMessages["name"] = "Please enter your name."
+      errorMessages.name = {}
+      errorMessages.name.en = "Please enter your full name."
+      errorMessages.name.fr = "Veuillez entrer votre prénom et votre nom."
     }
     else {
-      errorMessages["name"] = ""
+      errorMessages.name = ""
     }
 
     if (error) {
@@ -1383,7 +1447,7 @@ class PageSelector extends Component {
     }
 
     if (error || (!overrideBabyNameWarning && warning)) {
-      this.setState({errors: errorMessages, warning: warningMessages, confirmBabyNamesSubmit: error ? false : true})
+      this.setState({errors: errorMessages, warnings: warningMessages, confirmBabyNamesSubmit: error ? false : true})
     }
     else {
       var requestObject = {}
@@ -1417,8 +1481,9 @@ class PageSelector extends Component {
     }
     else {
       let value = input.target.value
+      // capitalize the first letter of every word
       if (input.target.name.indexOf("newBabyName") > -1 || input.target.name.indexOf("name") > -1) {
-        value = value.charAt(0).toUpperCase() + value.slice(1)
+        value = value.replace(/\w\S*/g, function(value){return value.charAt(0).toUpperCase() + value.substr(1).toLowerCase()})
       }
       state[input.target.name] = value
     }
@@ -1444,7 +1509,9 @@ class PageSelector extends Component {
           this.setState({ready:false})
         }
         // clear errors
-        this.setState({errors: {}, errorMessage: "", userInfo: ""})
+        this.setState({errors: {}})
+        delete this.state.errorMessage
+        delete this.state.userInfo
         $.ajax({
           type: "GET",
           url: "https://bu67qviz40.execute-api.us-west-2.amazonaws.com/prod",
@@ -1469,12 +1536,8 @@ class PageSelector extends Component {
             if (response != null && typeof response === "object") {
               // saves response in the state
               this.setState(response)
-              // toggles hide birthday checkbox
-              if (typeof response["age-category"] !== "undefined" && response["age-category"] !== "null") {
-                this.setState({hideBirthday: true})
-              }
               // parses birthday into year, month, and day
-              else if (typeof response.birthday !== "undefined" && response.birthday !== "null") {
+              if (typeof response.birthday !== "undefined" && response.birthday !== "null") {
                 // TODO
               }
               else if (typeof response.babyNames !== "undefined") {
@@ -1574,7 +1637,9 @@ class PageSelector extends Component {
         currentPage = (
           <Announcement
             language={this.state.language}
-            goToNewProfilePage={this.goToNewProfilePage} />
+            goToNewProfilePage={this.goToNewProfilePage}  
+            firstLogin={this.state.firstLogin}
+          />
         )
         break
       case "createProfile":
@@ -1656,6 +1721,7 @@ class PageSelector extends Component {
               language={this.state.language}
               authenticated={this.state.authenticated}
               currentPage={this.state.currentPage}
+              firstLogin={this.state.firstLogin}
               profileComplete={this.state.profileComplete}
               voted={this.state.voted}
               switchCurrentPage={this.switchCurrentPage}
