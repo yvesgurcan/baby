@@ -248,13 +248,27 @@ class Header extends Component {
   }
   translation() {
     return {
-      fr: {welcome: "Bienvenue !"},
-      en: {welcome: "Welcome!"}
+      fr: {
+        welcome: "Bienvenue !",
+        announcement: "Annonce",
+        createProfile: "Profil",
+        chooseBabyNames: "Prénoms de bébé",
+        logout: "Se déconnecter",
+      },
+      en: {
+        welcome: "Welcome!",
+        announcement: "Announcement",
+        createProfile: "Profile",
+        chooseBabyNames: "Baby Names",
+        logout: "Logout",
+      }
     }
   }
   render() {
     let translation = this.translation()[this.props.language]
-    let links = "lol"
+    let announcement = true
+    let createProfile = true
+    let babyNames = true
     return (
       <div>
         <Col xs={2} style={{marginTop: "5px", marginLeft: "-25px",padding: "0px"}} >
@@ -269,10 +283,14 @@ class Header extends Component {
           </div>
         </Col>
         }
-        <Col xs={this.props.currentPage !== "login" ? 10 : 2}  style={{marginTop: "22.5px", paddingRight: "0px"}} className="text-right">
-          {links}
-          <a className="logout" hidden={!this.props.authenticated} onClick={this.props.logout}>Logout</a>
+        {!this.props.authenticated ? null :
+        <Col xs={10}  style={{marginTop: "22.5px", paddingRight: "0px"}} className="text-right">
+          {!announcement ? null : <span><a id="announcement" className="menu-link" onClick={this.props.switchCurrentPage}>{translation.announcement}</a> | </span>}
+          {!createProfile ? null : <span><a id="createProfile" className="menu-link" onClick={this.props.switchCurrentPage}>{translation.createProfile}</a> | </span>}
+          {!babyNames ? null : <span><a id="chooseBabyNames" className="menu-link" onClick={this.props.switchCurrentPage}>{translation.chooseBabyNames}</a> | </span>}
+          {!this.props.authenticated ? null : <span><a className="menu-link" onClick={this.props.logout}>{translation.logout}</a></span>}
         </Col>
+        }
         <Clearfix/>
         <hr className="header"/>
       </div>
@@ -884,6 +902,7 @@ class PageSelector extends Component {
     this.submitLanguageShift = this.submitLanguageShift.bind(this)
     this.goToLogin = this.goToLogin.bind(this)
     this.goToNewProfilePage = this.goToNewProfilePage.bind(this)
+    this.switchCurrentPage = this.switchCurrentPage.bind(this)
     this.login = this.login.bind(this)
     this.logout = this.logout.bind(this)
     this.submitProfile = this.submitProfile.bind(this)
@@ -1153,6 +1172,9 @@ class PageSelector extends Component {
   // used on Announcement page
   goToNewProfilePage() {
     this.setState({currentPage: "createProfile"})
+  }
+  switchCurrentPage(input) {
+    this.setState({currentPage: input.target.id})
   }
 
   // used on Login page
@@ -1510,11 +1532,11 @@ class PageSelector extends Component {
   }
 
   render() {
+
     let showHeader = true
     let showFooter = true
     let currentPage = null
     let headerMessage = ""
-    // debug capabilities to work on a specific page
     // chooses appropriate page to show
     switch (this.state.currentPage) {
       default:
@@ -1627,8 +1649,10 @@ class PageSelector extends Component {
             <Header
               language={this.state.language}
               authenticated={this.state.authenticated}
-              headerMessage={headerMessage}
               currentPage={this.state.currentPage}
+              profileComplete={this.state.profileComplete}
+              voted={this.state.voted}
+              switchCurrentPage={this.switchCurrentPage}
               logout={this.logout}
             />
           }
