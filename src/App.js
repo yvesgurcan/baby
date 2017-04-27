@@ -1611,6 +1611,7 @@ class PageSelector extends Component {
     else if (!this.state.profileComplete && !this.state.voted) {
       currentPage = "createProfile"
     }
+    // too strict: prevents user from going back to their profile
     else if (!this.state.voted) {
       currentPage = "chooseBabyNames"
     }
