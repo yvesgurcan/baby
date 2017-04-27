@@ -285,11 +285,7 @@ class Header extends Component {
         <Col xs={10}  style={{marginTop: "22.5px", paddingRight: "0px"}} className="text-right">
           <span><a id="announcement" className="menu-link" onClick={this.props.switchCurrentPage}>{translation.announcement}</a> | </span>
           {
-<<<<<<< HEAD
             (!this.props.firstLogin || this.props.profileComplete || this.props.currentPage === "createProfile")
-=======
-            (!this.props.firstLogin || this.props.currentPage === "createProfile")
->>>>>>> d9791ac2724e02d9ca6d5df94db329bf6b2ceb7f
               ? <span><a id="createProfile" className="menu-link" onClick={this.props.switchCurrentPage}>{translation.createProfile}</a> | </span>
               : null
           }
@@ -1624,11 +1620,6 @@ class PageSelector extends Component {
     let pageMainContent = null
     let showHeader = true
     let showFooter = true
-<<<<<<< HEAD
-    let currentPage = null
-=======
-    let headerMessage = ""
->>>>>>> d9791ac2724e02d9ca6d5df94db329bf6b2ceb7f
     // chooses appropriate page to show
     switch (currentPage) {
       default:
