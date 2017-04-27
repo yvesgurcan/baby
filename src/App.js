@@ -265,6 +265,7 @@ class Header extends Component {
     }
   }
   render() {
+    let showNav = this.props.currentPage !== null && this.props.currentPage !== "login"
     let translation = this.translation()[this.props.language]
     return (
       <div>
@@ -280,11 +281,15 @@ class Header extends Component {
           </div>
         </Col>
         }
-        {!this.props.authenticated ? null :
+        {!showNav ? null :
         <Col xs={10}  style={{marginTop: "22.5px", paddingRight: "0px"}} className="text-right">
           <span><a id="announcement" className="menu-link" onClick={this.props.switchCurrentPage}>{translation.announcement}</a> | </span>
           {
+<<<<<<< HEAD
             (!this.props.firstLogin || this.props.profileComplete || this.props.currentPage === "createProfile")
+=======
+            (!this.props.firstLogin || this.props.currentPage === "createProfile")
+>>>>>>> d9791ac2724e02d9ca6d5df94db329bf6b2ceb7f
               ? <span><a id="createProfile" className="menu-link" onClick={this.props.switchCurrentPage}>{translation.createProfile}</a> | </span>
               : null
           }
@@ -298,7 +303,7 @@ class Header extends Component {
             ? <span><a id="showBabyNameStats" className="menu-link" onClick={this.props.switchCurrentPage}>{translation.chooseBabyNames}</a> | </span>
             : null
           }
-          {!this.props.authenticated ? null : <span><a className="menu-link" onClick={this.props.logout}>{translation.logout}</a></span>}
+          <span><a className="menu-link" onClick={this.props.logout}>{translation.logout}</a></span>
         </Col>
         }
         <Clearfix/>
@@ -1598,15 +1603,38 @@ class PageSelector extends Component {
 
   render() {
 
+    let currentPage = this.state.currentPage
+
+    // do not let user mess around with the currentPage state
+    if (currentPage === null || currentPage === "login" || currentPage === "announcement" || this.state.admin) {
+      // rule these pages out
+    }
+    else if (this.state.firstLogin) {
+      currentPage = "announcement"
+    }
+    else if (!this.state.profileComplete && !this.state.voted) {
+      currentPage = "createProfile"
+    }
+    else if (!this.state.voted) {
+      currentPage = "chooseBabyNames"
+    }
+
+    console.log(currentPage)
+
+    let pageMainContent = null
     let showHeader = true
     let showFooter = true
+<<<<<<< HEAD
     let currentPage = null
+=======
+    let headerMessage = ""
+>>>>>>> d9791ac2724e02d9ca6d5df94db329bf6b2ceb7f
     // chooses appropriate page to show
-    switch (this.state.currentPage) {
+    switch (currentPage) {
       default:
         showHeader = false
         showFooter = false
-        currentPage = (
+        pageMainContent = (
           <Flags
             mainPage
             language={this.state.language}
@@ -1617,7 +1645,7 @@ class PageSelector extends Component {
         )
         break
       case "login":
-        currentPage = (
+        pageMainContent = (
           <Login
             language={this.state.language}
             email={this.state.email}
@@ -1629,7 +1657,7 @@ class PageSelector extends Component {
         )
         break
       case "announcement":
-        currentPage = (
+        pageMainContent = (
           <Announcement
             language={this.state.language}
             goToNewProfilePage={this.goToNewProfilePage}  
@@ -1638,7 +1666,7 @@ class PageSelector extends Component {
         )
         break
       case "createProfile":
-        currentPage = (
+        pageMainContent = (
           <CreateProfile
             language={this.state.language}
             gender={this.state.gender}
@@ -1669,7 +1697,7 @@ class PageSelector extends Component {
         for (var i = 1; i <= this.state.maxNewBabyNames; i++) {
           newBabyNames["newBabyName" + i] = this.state["newBabyName" + i]
         }
-        currentPage = (
+        pageMainContent = (
           <ChooseBabyNames
             language={this.state.language}
             email={this.state.email}
@@ -1689,7 +1717,7 @@ class PageSelector extends Component {
         )
         break
       case "showBabyNameStats":
-        currentPage = (
+        pageMainContent = (
           <ShowBabyNameStats
             language={this.state.language}
             babyNames={this.state.babyNames}
@@ -1700,7 +1728,7 @@ class PageSelector extends Component {
 
     // spinner
     if (!this.state.ready) {
-      currentPage = <PageSpinner/>
+      pageMainContent = <PageSpinner/>
     }
 
     return (
@@ -1740,7 +1768,7 @@ class PageSelector extends Component {
           {/* page main content */}
           
         <div  className="content">
-          {currentPage}
+          {pageMainContent}
         </div>
           {/* footer */}
           {!showFooter ? null :
