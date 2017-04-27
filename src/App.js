@@ -10,20 +10,20 @@ const currentYear = new Date().getFullYear()
 const defaultState = {
       language: "de",
       languageChoices: ["en","fr"],
-      gender: "X",
-      day: 50,
-      month: "lol",
-      year: 500,
-      minYear: Math.floor((currentYear - 100) / 5) * 5,
-      maxYear: Math.ceil((currentYear - 2000) / 5) * 5,
+      gender: "F",
+      day: 1,
+      month: "January",
+      year: 1960,
+      minYear: Math.floor((currentYear - 80) / 5) * 5,
+      maxYear: Math.ceil((currentYear - 15) / 5) * 5,
       hideBirthday: false,
-      "age-category": "99-74",
+      "age-category": "50-74",
       ageCategoryChoices: ["24-","25-49","50-74","75+"],
-      country: "www",
+      country: "usa",
       countryChoices: ["usa","france"],
       relationship: "relative",
       relationshipChoices: ["relative","friend","coworker"],
-      maxNewBabyNames: "a",
+      maxNewBabyNames: 3,
       maxSelectableBabyNames: 5,
 }
 
@@ -284,17 +284,17 @@ class Header extends Component {
         <Col xs={10}  style={{marginTop: "22.5px", paddingRight: "0px"}} className="text-right">
           <span><a id="announcement" className="menu-link" onClick={this.props.switchCurrentPage}>{translation.announcement}</a> | </span>
           {
-            (!this.props.authenticated || !this.props.firstLogin || this.props.currentPage === "createProfile")
+            (!this.props.firstLogin || this.props.profileComplete || this.props.currentPage === "createProfile")
               ? <span><a id="createProfile" className="menu-link" onClick={this.props.switchCurrentPage}>{translation.createProfile}</a> | </span>
               : null
           }
           {
-            (!this.props.authenticated || (this.props.profileComplete && !this.props.voted))
+            (this.props.profileComplete && !this.props.voted)
             ? <span><a id="chooseBabyNames" className="menu-link" onClick={this.props.switchCurrentPage}>{translation.chooseBabyNames}</a> | </span>
             : null
           }
           {
-            (!this.props.authenticated || (this.props.profileComplete && this.props.voted))
+            (this.props.profileComplete && this.props.voted)
             ? <span><a id="showBabyNameStats" className="menu-link" onClick={this.props.switchCurrentPage}>{translation.chooseBabyNames}</a> | </span>
             : null
           }
@@ -559,10 +559,6 @@ class CreateProfile extends Component {
     return relationships
   }
   render() {
-    let disabled =
-      this.props.profileComplete && this.props.admin !== true
-      ? true
-      : false
     let translation = this.translation()[this.props.language]
     // reverse order of day and month depending on language
     let box1, box2
@@ -1227,7 +1223,7 @@ class PageSelector extends Component {
 
   // used on Announcement page
   goToNewProfilePage() {
-    this.setState({currentPage: "createProfile"})
+    this.setState({currentPage: "createProfile",firstLogin: false})
   }
   switchCurrentPage(input) {
     this.setState({currentPage: input.target.id})
@@ -1605,7 +1601,6 @@ class PageSelector extends Component {
     let showHeader = true
     let showFooter = true
     let currentPage = null
-    let headerMessage = ""
     // chooses appropriate page to show
     switch (this.state.currentPage) {
       default:
