@@ -27,8 +27,8 @@ const defaultState = {
       relationshipChoices: ["relative","friend","coworker"],
       maxNewBabyNames: 3,
       maxSelectableBabyNames: 5,
-      minBabyNameSize: 5,
-      maxBabyNameSize: 15,
+      minBabyNameSize: 4,
+      maxBabyNameSize: 18,
 }
 
 const defaultBabyNameNumbers = {}
@@ -537,7 +537,20 @@ class ShowBabyNameStats extends Component {
 }
 
 class ChooseBabyNames extends Component {
+  translation() {
+    return {
+      fr: {
+          deleteButton: "Supprimer les noms"
+        },
+      en: {
+        deleteButton: "Delete Names"
+      }
+    }
+  }
   render() {
+
+    let translation = this.translation()[this.props.language]
+
     let babyNames = null
     if (!this.props.backgroundQueryReady) {
       babyNames = <LocalSpinner/>
@@ -634,8 +647,20 @@ class ChooseBabyNames extends Component {
             block
             bsSize="large"
             bsStyle="primary"
+            className="margin-bottom"
             onClick={this.props.confirmBabyNamesSubmit ? this.props.overrideBabyNameWarning: this.props.submitBabyNames}
           >Submit Names</Button>
+        </Col>
+        }
+        {this.props.admin !== true ? null :
+        <Col sm={12}>
+          <Button
+            block
+            bsSize="large"
+            bsStyle="danger"
+            className="margin-bottom"
+            onClick={this.props.confirmBabyNamesSubmit ? this.props.overrideBabyNameWarning: this.props.submitBabyNames}
+          >{translation.deleteButton}</Button>
         </Col>
         }
     </div>
@@ -1783,11 +1808,20 @@ class PageSelector extends Component {
               if (typeof response.birthday !== "undefined" && response.birthday !== "null") {
                 // TODO
               }
-              else if (typeof response.babyNames !== "undefined") {
+              // parse baby names into an array (used to check if name has already been submitted when user votes)
+              if (typeof response.babyNames !== "undefined") {
                 let babyNameList = response.babyNames.map(babyNameData => {
                   return babyNameData.name
                 })
                 this.setState({babyNameList: babyNameList})
+              }
+              // refresh baby names after user has voted
+              if (request === "addBabyNames") {
+                this.api(
+                  "showBabyNames",
+                  {email: this.state.email},
+                  "backgroundQuerySpinner",
+                  )
               }
               // no error
               if (typeof response.errorMessage === "undefined") {
