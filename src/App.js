@@ -11,6 +11,7 @@ const defaultState = {
       language: "de",
       languageChoices: ["en","fr"],
       gender: "F",
+      genderChoices: ["F","M"],
       day: 1,
       month: "January",
       year: 1960,
@@ -27,7 +28,7 @@ const defaultState = {
       maxSelectableBabyNames: 5,
 }
 
-const test = {}
+const defaultBabyNameNumbers = {}
 
 /* spinner */
 
@@ -993,7 +994,7 @@ class PageSelector extends Component {
       ? defaultState.maxNewBabyNames
       : arbitraryMaxNewBabyNames
 
-    test.defaultUserStateMaxNewBabyNames = defaultUserState.maxNewBabyNames
+    defaultBabyNameNumbers.defaultUserStateMaxNewBabyNames = defaultUserState.maxNewBabyNames
 
     // check default max number of selectable baby names
     const arbitraryMaxSelectableBabyNames = 3
@@ -1005,7 +1006,7 @@ class PageSelector extends Component {
       ? defaultState.maxSelectableBabyNames
       : arbitraryMaxSelectableBabyNames
     
-    test.defaultUserStateMaxSelectableBabyNames = defaultUserState.maxSelectableBabyNames
+    defaultBabyNameNumbers.defaultUserStateMaxSelectableBabyNames = defaultUserState.maxSelectableBabyNames
 
     for (var i = 1; i <= defaultUserState.maxNewBabyNames; i++) {
       defaultUserState["newBabyName" + i] = ""
@@ -1180,15 +1181,15 @@ class PageSelector extends Component {
     }
 
     // prevent changes on maxBabyNames
-    if (this.state.maxNewBabyNames !== test.defaultUserStateMaxNewBabyNames) {
-      fallback = test.defaultUserStateMaxNewBabyNames
+    if (this.state.maxNewBabyNames !== defaultBabyNameNumbers.defaultUserStateMaxNewBabyNames) {
+      fallback = defaultBabyNameNumbers.defaultUserStateMaxNewBabyNames
       this.storeRawData({maxNewBabyNames: fallback})
       console.warn("You can not change maxNewBabyNames from '" + fallback + "' to '" + this.state.maxNewBabyNames + "' once the App was mounted.")
     }
 
     // prevent changes on max SelectableBabyNames
-    if (this.state.maxSelectableBabyNames !== test.defaultUserStateMaxSelectableBabyNames) {
-      fallback = test.defaultUserStateMaxSelectableBabyNames
+    if (this.state.maxSelectableBabyNames !== defaultBabyNameNumbers.defaultUserStateMaxSelectableBabyNames) {
+      fallback = defaultBabyNameNumbers.defaultUserStateMaxSelectableBabyNames
       this.storeRawData({maxSelectableBabyNames: fallback})
       console.warn("You can not change maxSelectableBabyNames from '" + fallback + "' to '" + this.state.maxSelectableBabyNames + "' once the App was mounted.")
     }
@@ -1713,6 +1714,11 @@ class PageSelector extends Component {
           <ShowBabyNameStats
             language={this.state.language}
             babyNames={this.state.babyNames}
+            languageChoices={this.state.languageChoices}
+            genderChoices={this.state.genderChoices}
+            ageCategoryChoices={this.state.ageCategoryChoices}
+            countryChoices={this.state.countryChoices}
+            relationshipChoices={this.state.relationshipChoices}
           />
         )
         break
