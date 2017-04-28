@@ -35,7 +35,7 @@ html, body {
   margin-right: 10px;
 }   
 
-.menu-link {
+.menu-link, .fake-disabled {
   cursor: pointer !important;
 }
 

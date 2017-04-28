@@ -8,6 +8,7 @@ const currentYear = new Date().getFullYear()
 // default state
 // all these values can be modified at will, the App should handle gracefully any unexpected or weird value
 const defaultState = {
+      email: "gurcan.yves@gmail.com",
       language: "de",
       languageChoices: ["en","fr"],
       gender: "F",
@@ -26,6 +27,8 @@ const defaultState = {
       relationshipChoices: ["relative","friend","coworker"],
       maxNewBabyNames: 3,
       maxSelectableBabyNames: 5,
+      minBabyNameSize: 5,
+      maxBabyNameSize: 15,
 }
 
 const defaultBabyNameNumbers = {}
@@ -296,6 +299,11 @@ class Header extends Component {
             : null
           }
           {
+            (this.props.admin)
+            ? <span><a id="chooseBabyNames" className="menu-link" onClick={this.props.switchCurrentPage}>Votes</a> | </span>
+            : null
+          }
+          {
             (this.props.profileComplete && this.props.voted)
             ? <span><a id="showBabyNameStats" className="menu-link" onClick={this.props.switchCurrentPage}>{translation.chooseBabyNames}</a> | </span>
             : null
@@ -325,9 +333,205 @@ class Footer extends Component {
 /* pages main content */
 
 class ShowBabyNameStats extends Component {
+  translation() {
+    return {
+      fr: {
+        F: "Femmes",
+        M: "Hommes",
+        allGender: "Tous",
+        france: "France",
+        usa: "Etats-Unis",
+        allCountries: "Tous",
+        relative: "Famille",
+        friend: "Amis",
+        coworker: "Collègues",
+        allRelationships: "Tous",
+        "24-": "24-",
+        "25-49": "25-49 ans",
+        "50-74": "50-74 ans",
+        "75+": "74+",
+        allAgeCategories: "Tous",
+      },
+      en: {
+        F: "Women",
+        M: "Men",
+        allGender: "All",
+        france: "France",
+        usa: "United States",
+        allCountries: "All",
+        relative: "Relatives",
+        friend: "Friends",
+        coworker: "Coworkers",
+        allRelationships: "All",
+        "24-": "24-",
+        "25-49": "25-49",
+        "50-74": "50-74",
+        "75+": "74+",
+        allAgeCategories: "All",
+
+      },
+    }
+  }
   render() {
+
+    if (this.props.babyNames.length === 0) {
+      return null
+    }
+
+    let translation = this.translation()[this.props.language]
+
+    let genders = this.props.genderChoices.map(gender => {
+      return (
+        <Col key={gender} xs={12} sm={Number(Number(12 / this.props.genderChoices.length).toFixed(0))}>
+          <Button
+            id="selectedGender"
+            name={gender}
+            bsSize="large"
+            bsStyle="warning"
+            block
+            active={this.props.selectedGender === gender}
+            className="margin-bottom"
+            onClick={this.props.selectParameter}
+          >
+            {translation[gender]}
+          </Button>
+        </Col>
+      )
+    })
+
+    let countries = this.props.countryChoices.map(country => {
+      return (
+        <Col key={country} xs={12} sm={Number(Number(12 / this.props.countryChoices.length).toFixed(0))}>
+          <Button
+            id="selectedCountry"
+            name={country}
+            bsSize="large"
+            bsStyle="warning"
+            block
+            active={this.props.selectedCountry === country}
+            className="margin-bottom"
+            onClick={this.props.selectParameter}
+          >
+            {translation[country]}
+          </Button>
+        </Col>
+      )
+    })
+
+    let relationships = this.props.relationshipChoices.map(relationship => {
+      return (
+        <Col key={relationship} xs={12} sm={Number(Number(12 / this.props.relationshipChoices.length).toFixed(0))}>
+          <Button
+            id="selectedRelationship"
+            name={relationship}
+            bsSize="large"
+            bsStyle="warning"
+            block
+            active={this.props.selectedRelationship === relationship}
+            className="margin-bottom"
+            onClick={this.props.selectParameter}
+          >
+            {translation[relationship]}
+          </Button>
+        </Col>
+      )
+    })
+
+    let ageCategories = this.props.ageCategoryChoices.map(ageCategory => {
+      let modifier = ageCategory === "25-49" || ageCategory === "50-74" ? 1 : 0
+      return (
+        <Col key={ageCategory} xs={12} sm={Number(Number(12 / this.props.ageCategoryChoices.length).toFixed(0)) + Number(modifier)}>
+          <Button
+            id="selectedAgeCategory"
+            name={ageCategory}
+            bsSize="large"
+            bsStyle="warning"
+            block
+            className="margin-bottom"
+            active={this.props.selectedAgeCategory === ageCategory}
+            onClick={this.props.selectParameter}
+          >
+            {translation[ageCategory]}
+          </Button>
+        </Col>
+      )
+    })
+
+    let totalVotes = 0
+    let babyNameVotes = []
+    for (var i = 0; i < this.props.babyNames.length; i++) {
+      let babyName = this.props.babyNames[i]
+      let selectedGender = babyName[this.props.selectedGender] ? Number(babyName[this.props.selectedGender]) : 0
+      let selectedAgeCategory = babyName[this.props.selectedAgeCategory] ? Number(babyName[this.props.selectedAgeCategory]) : 0
+      let selectedRelationship = babyName[this.props.selectedRelationship] ? Number(babyName[this.props.selectedRelationship]) : 0
+      let selectedCountry = babyName[this.props.selectedCountry] ? Number(babyName[this.props.selectedCountry]) : 0
+
+      let babyNameTotal = Number(selectedGender) + Number(selectedAgeCategory) + Number(selectedRelationship) + Number(selectedCountry)
+      babyNameVotes.push(babyNameTotal)
+      totalVotes = Number(totalVotes) + Number(babyNameTotal)
+      /*console.log(
+        "name",babyName.name,
+        "total",babyNameTotal,
+        "selectedGender",selectedGender,
+        "selectedAgeCategory",selectedAgeCategory,
+        "selectedRelationship",selectedRelationship,
+        "selectedCountry",selectedCountry,
+      )*/
+    }
+    let maxPopularity = babyNameVotes.reduce(function(a, b) {
+        return Math.max(a, b);
+    })
+    let minPopularity = babyNameVotes.reduce(function(a, b) {
+        return Math.min(a, b);
+    })
+
+
+    let sortedBabyNames = this.props.babyNames.map((babyName, index) => {
+      let popularityRatio = (babyNameVotes[index] - minPopularity) / (maxPopularity - minPopularity)
+      let paddingVertical = (popularityRatio * (this.props.maxBabyNameSize - this.props.minBabyNameSize)) + this.props.minBabyNameSize
+      let paddingHorizontal = ((popularityRatio * (this.props.maxBabyNameSize - this.props.minBabyNameSize)) + this.props.minBabyNameSize) * 3
+      console.log(
+        "name:",babyName.name,
+        "votes:",babyNameVotes[index],
+        "popularityRatio:",popularityRatio,
+        /*
+        "paddingVertical:",paddingVertical,
+        "paddingHorizontal:",paddingHorizontal
+        */
+      )
+      return (
+        <Button
+          style={{
+            paddingTop: paddingVertical + "px",
+            paddingBottom: paddingVertical + "px",
+            paddingLeft: paddingHorizontal + "px",
+            paddingRight: paddingHorizontal + "px",
+          }}
+          key={babyName.name}
+          bsSize="large"
+          bsStyle="success"
+          className="margin-bottom margin-right"
+        >
+          {babyName.name}
+        </Button>
+      )
+    })
+    console.log("-----")
     return (
-      <div>show survey</div>
+      <div>
+          {countries}
+        <Clearfix/>
+          {relationships}
+        <Clearfix/>
+          {genders}
+        <Clearfix/>
+          {ageCategories}
+        <Clearfix/>
+        <hr/>
+        <Col>
+        {sortedBabyNames}
+        </Col>
+      </div>
     )
   }
 }
@@ -349,9 +553,11 @@ class ChooseBabyNames extends Component {
             className="margin-bottom margin-right"
             active={String(this.props.selectedBabyNames).indexOf(babyName.name) > -1 ? true : false}
             onClick={this.props.selectBabyName}
+            disabled={this.props.voted && this.props.admin !== true ? true : false}
           >
             {babyName.name}
-          </Button>)
+          </Button>
+        )
       })
     }
     let newBabyNameInput = []
@@ -366,6 +572,7 @@ class ChooseBabyNames extends Component {
               bsSize="large"
               className="margin-bottom"
               onChange={this.props.storeData}
+              disabled={this.props.voted && this.props.admin !== true ? true : false}
             />
             {
               !this.props.errors["newBabyName" + i] ?
@@ -421,6 +628,7 @@ class ChooseBabyNames extends Component {
           }
         </Col>
         <hr/>
+        {this.props.voted && this.props.admin !== true ? null :
         <Col sm={12}>
           <Button
             block
@@ -428,7 +636,8 @@ class ChooseBabyNames extends Component {
             bsStyle="primary"
             onClick={this.props.confirmBabyNamesSubmit ? this.props.overrideBabyNameWarning: this.props.submitBabyNames}
           >Submit Names</Button>
-      </Col>
+        </Col>
+        }
     </div>
     )
   }
@@ -573,6 +782,7 @@ class CreateProfile extends Component {
                 bsSize="large"
                 className="margin-bottom"
                 onChange={this.props.storeData}
+                disabled={this.props.profileComplete && this.props.admin !== true ? true : false}
               >
                 {this.daysOfTheMonth()}
               </FormControl>
@@ -587,6 +797,7 @@ class CreateProfile extends Component {
                 bsSize="large"
                 className="margin-bottom"
                 onChange={this.props.storeData}
+                disabled={this.props.profileComplete && this.props.admin !== true ? true : false}
               >
                 {this.months()}
               </FormControl>
@@ -654,7 +865,7 @@ class CreateProfile extends Component {
         </Col>
         <Col sm={5}>
           <FormControl
-            disabled={this.props.admin === true ? false : true}
+            disabled={true}
             value={this.props.email ? this.props.email : ""}
             bsSize="large"
             className="margin-bottom"
@@ -950,6 +1161,7 @@ class PageSelector extends Component {
     this.goToLogin = this.goToLogin.bind(this)
     this.goToNewProfilePage = this.goToNewProfilePage.bind(this)
     this.switchCurrentPage = this.switchCurrentPage.bind(this)
+    this.setUserInfoMessage = this.setUserInfoMessage.bind(this)
     this.login = this.login.bind(this)
     this.logout = this.logout.bind(this)
     this.submitProfile = this.submitProfile.bind(this)
@@ -957,7 +1169,7 @@ class PageSelector extends Component {
     this.selectBabyName = this.selectBabyName.bind(this)
     this.overrideBabyNameWarning = this.overrideBabyNameWarning.bind(this)
     this.submitBabyNames = this.submitBabyNames.bind(this)
-    this.sortBabyNames = this.sortBabyNames.bind(this)
+    this.selectParameter = this.selectParameter.bind(this)
     this.storeData = this.storeData.bind(this)
     this.api = this.api.bind(this)    
 
@@ -983,6 +1195,11 @@ class PageSelector extends Component {
     defaultUserState.warnings =  {}
     defaultUserState.ready = true
     defaultUserState.backgroundQueryReady = true
+    defaultUserState.babyNames = []
+    defaultUserState.genderChoices.push("allGender")
+    defaultUserState.ageCategoryChoices.push("allAgeCategories")
+    defaultUserState.countryChoices.push("allCountries")
+    defaultUserState.relationshipChoices.push("allRelationships")
 
     // check default max number of new baby names
     const arbitraryMaxNewBabyNames = 3
@@ -1054,7 +1271,7 @@ class PageSelector extends Component {
 
   // try to maintain user session if still authenticated and load baby names silently
   componentDidMount() {
-    if (this.state.currentPage === "login" && this.state.email !== "") {
+    if (this.state.currentPage === "login" && this.state.email !== null) {
       const URLfragments = this.URLfragments()
       let that = this
       // wait a millisecond to receive auto-fill input from the user's browser
@@ -1066,7 +1283,7 @@ class PageSelector extends Component {
             true)
           that.state.email !== "" ? that.getBabyNames() : null
         },
-        1)
+        100)
     }
     // triggers the state check manually
     this.componentDidUpdate()
@@ -1084,14 +1301,19 @@ class PageSelector extends Component {
       console.warn("Unsupported language '" + this.state.language + "'. Language set to fallback '" + fallback + "'.")
     }
 
-    // check current page
+    // check current page is valid
     if (this.state.currentPage !== "login"
     && this.state.currentPage !=="announcement"
     && this.state.currentPage !=="createProfile"
     && this.state.currentPage !=="chooseBabyNames"
     && this.state.currentPage !=="showBabyNameStats"
     && this.state.currentPage !== null) {
-      fallback = "login"
+      if (this.state.authenticated) {
+        fallback = "announcement"
+      }
+      else {
+        fallback = "login"
+      }
       console.log(prevState.currentPage,this.state.currentPage)
       this.storeRawData({currentPage: fallback})
       console.warn("Incorrect page '" + this.state.currentPage + "' was replaced by fallback '" + fallback + "'.")
@@ -1227,10 +1449,18 @@ class PageSelector extends Component {
   goToNewProfilePage() {
     this.setState({currentPage: "createProfile",firstLogin: false})
   }
+
+  // used on Header
   switchCurrentPage(input) {
     this.setState({currentPage: input.target.id})
     delete this.state.userInfo
     delete this.state.errorMessage
+  }
+
+  // used on any page
+  setUserInfoMessage(message) {
+    console.log("hello2")
+    this.setState({userInfo: message})
   }
 
   // used on Login page
@@ -1290,7 +1520,12 @@ class PageSelector extends Component {
       false
     )
     let defaultUserState = defaultState
-    defaultUserState["authenticated"] = false
+    defaultUserState.selectedBabyNames = ""
+    defaultUserState.errors = {}
+    defaultUserState.warnings =  {}
+    defaultUserState.ready = true
+    defaultUserState.backgroundQueryReady = true
+    defaultUserState.authenticated = false
     this.setState(defaultUserState)
     delete this.state.admin
     delete this.state.firstLogin
@@ -1337,7 +1572,15 @@ class PageSelector extends Component {
           country: this.state.country,
           relationship: this.state.relationship,
         }
-      ) 
+      )
+      let selectedParameters = {
+        selectedGender: this.state.gender,
+        selectedCountry: this.state.country,
+        // you probably want to calculate the birthday here
+        selectedAgeCategory: ageCategory === null ? "allAgeCategories" : ageCategory,
+        selectedRelationship: this.state.relationship
+      }
+      this.setState(selectedParameters)
     }
   }
 
@@ -1381,11 +1624,11 @@ class PageSelector extends Component {
 
     // handle vote errors for existing names
     if (selectedNameCount > selectableNameCount) {
-      errorMessages["selectedBabyNames"] = "Please do not select more than " + selectableNameCount + " names."
+      errorMessages.selectedBabyNames = "Please do not select more than " + selectableNameCount + " names."
       error = true
     }
     else {
-      errorMessages["selectedBabyNames"] = ""
+      errorMessages.selectedBabyNames = ""
     }
 
     // handle new name errors
@@ -1418,11 +1661,11 @@ class PageSelector extends Component {
         : "You have selected only " + selectedNameCount + " names ";
 
       submit = !error ? "Are you sure you want to continue? Click on submit again to confirm." : ""
-      warningMessages["selectedBabyNames"] = nameSelectedMessage + " (max is " + selectableNameCount + " names). " + submit
+      warningMessages.selectedBabyNames = nameSelectedMessage + " (max is " + selectableNameCount + " names). " + submit
       warning = true
     }
     else {
-      warningMessages["selectedBabyNames"] = ""
+      warningMessages.selectedBabyNames = ""
     }
 
     // handle warnings for new baby names
@@ -1437,11 +1680,11 @@ class PageSelector extends Component {
 
 
       submit = !error ? "Are you sure you want to continue? Click on submit again to confirm." : ""
-      warningMessages["newBabyNames"] = nameEnteredMessage + "You can add up to " + this.state.maxNewBabyNames + " names to the list. " + submit
+      warningMessages.newBabyNames = nameEnteredMessage + "You can add up to " + this.state.maxNewBabyNames + " names to the list. " + submit
       warning = true
     }
     else {
-      warningMessages["newBabyNames"] = "" 
+      warningMessages.newBabyNames = "" 
     }
 
     if (error || (!overrideBabyNameWarning && warning)) {
@@ -1461,14 +1704,16 @@ class PageSelector extends Component {
       this.api(
         "addBabyNames",
         requestObject,
-        false
       )
     }
   }
 
   // used by showBabyNameStats
-  sortBabyNames() {
-    // TODO
+  selectParameter(input) {
+    console.log(input)
+    let parameter = {}
+    parameter[input.target.id] = input.target.name
+    this.setState(parameter)
   }
 
   // used by forms
@@ -1603,21 +1848,30 @@ class PageSelector extends Component {
     let currentPage = this.state.currentPage
 
     // do not let user mess around with the currentPage state
+    // do not modify currentPage for the cases below
     if (currentPage === null || currentPage === "login" || currentPage === "announcement" || this.state.admin) {
-      // rule these pages out
     }
+    // first page seen when user logs in for the first time must be announcenement
     else if (this.state.firstLogin) {
       currentPage = "announcement"
     }
+    // user has not created a profile yet
     else if (!this.state.profileComplete && !this.state.voted) {
       currentPage = "createProfile"
     }
-    // too strict: prevents user from going back to their profile
-    else if (!this.state.voted) {
+    // user has not voted yet
+    else if (currentPage === "showBabyNameStats" && this.state.profileComplete && !this.state.voted) {
       currentPage = "chooseBabyNames"
     }
+    // user has voted already
+    /*else if (currentPage === "chooseBabyNames" && this.state.profileComplete && this.state.voted) {
+      currentPage = "showBabyNameStats"
+    }*/
 
-    console.log(currentPage)
+    if (this.state.currentPage !== currentPage) {
+      console.warn("Access to '" + this.state.currentPage + "' is forbidden. Replaced by '" + currentPage + "'.")
+    }
+    
 
     let pageMainContent = null
     let showHeader = true
@@ -1690,24 +1944,26 @@ class PageSelector extends Component {
         for (var i = 1; i <= this.state.maxNewBabyNames; i++) {
           newBabyNames["newBabyName" + i] = this.state["newBabyName" + i]
         }
-        pageMainContent = (
-          <ChooseBabyNames
-            language={this.state.language}
-            email={this.state.email}
-            babyNames={this.state.babyNames}
-            selectBabyName={this.selectBabyName}
-            selectedBabyNames={this.state.selectedBabyNames}
-            maxNewBabyNames={this.state.maxNewBabyNames}
-            newBabyNames={newBabyNames}
-            submitBabyNames={this.submitBabyNames}
-            confirmBabyNamesSubmit={this.state.confirmBabyNamesSubmit}
-            overrideBabyNameWarning={this.overrideBabyNameWarning}
-            storeData={this.storeData}
-            warnings={this.state.warnings}
-            errors={this.state.errors}
-            backgroundQueryReady={this.state.backgroundQueryReady}
-          />
-        )
+          pageMainContent = (
+            <ChooseBabyNames
+              language={this.state.language}
+              email={this.state.email}
+              babyNames={this.state.babyNames}
+              selectBabyName={this.selectBabyName}
+              selectedBabyNames={this.state.selectedBabyNames}
+              maxNewBabyNames={this.state.maxNewBabyNames}
+              newBabyNames={newBabyNames}
+              submitBabyNames={this.submitBabyNames}
+              confirmBabyNamesSubmit={this.state.confirmBabyNamesSubmit}
+              overrideBabyNameWarning={this.overrideBabyNameWarning}
+              storeData={this.storeData}
+              warnings={this.state.warnings}
+              errors={this.state.errors}
+              backgroundQueryReady={this.state.backgroundQueryReady}
+              voted={this.state.voted}
+              admin={this.state.admin}
+            />
+          )
         break
       case "showBabyNameStats":
         pageMainContent = (
@@ -1719,6 +1975,13 @@ class PageSelector extends Component {
             ageCategoryChoices={this.state.ageCategoryChoices}
             countryChoices={this.state.countryChoices}
             relationshipChoices={this.state.relationshipChoices}
+            minBabyNameSize={this.state.minBabyNameSize}
+            maxBabyNameSize={this.state.maxBabyNameSize}
+            selectParameter={this.selectParameter}
+            selectedGender={this.state.selectedGender}
+            selectedCountry={this.state.selectedCountry}
+            selectedRelationship={this.state.selectedRelationship}
+            selectedAgeCategory={this.state.selectedAgeCategory}
           />
         )
         break
@@ -1747,6 +2010,7 @@ class PageSelector extends Component {
               voted={this.state.voted}
               switchCurrentPage={this.switchCurrentPage}
               logout={this.logout}
+              admin={this.state.admin}
             />
           }
           {/* User info message */}
