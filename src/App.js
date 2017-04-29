@@ -659,7 +659,7 @@ class ChooseBabyNames extends Component {
             bsSize="large"
             bsStyle="danger"
             className="margin-bottom"
-            onClick={this.props.confirmBabyNamesSubmit ? this.props.overrideBabyNameWarning: this.props.submitBabyNames}
+            onClick={this.props.deleteBabyNames}
           >{translation.deleteButton}</Button>
         </Col>
         }
@@ -1194,6 +1194,7 @@ class PageSelector extends Component {
     this.selectBabyName = this.selectBabyName.bind(this)
     this.overrideBabyNameWarning = this.overrideBabyNameWarning.bind(this)
     this.submitBabyNames = this.submitBabyNames.bind(this)
+    this.deleteBabyNames = this.deleteBabyNames.bind(this)
     this.selectParameter = this.selectParameter.bind(this)
     this.storeData = this.storeData.bind(this)
     this.api = this.api.bind(this)    
@@ -1733,6 +1734,19 @@ class PageSelector extends Component {
     }
   }
 
+  deleteBabyNames() {
+    var requestObject = {}
+    for (var x = 1; x <= this.state.maxNewBabyNames; x++) {
+      requestObject["newBabyName" + x] = this.state["newBabyName" + x]
+    }
+    requestObject.email = this.state.email
+    requestObject.newBabyNameCount = this.state.maxNewBabyNames
+    this.api(
+      "deleteBabyNames",
+      requestObject,
+    )
+  }
+
   // used by showBabyNameStats
   selectParameter(input) {
     console.log(input)
@@ -1816,7 +1830,7 @@ class PageSelector extends Component {
                 this.setState({babyNameList: babyNameList})
               }
               // refresh baby names after user has voted
-              if (request === "addBabyNames") {
+              if (request === "addBabyNames" || request === "deleteBabyNames") {
                 this.api(
                   "showBabyNames",
                   {email: this.state.email},
@@ -1989,6 +2003,7 @@ class PageSelector extends Component {
               newBabyNames={newBabyNames}
               submitBabyNames={this.submitBabyNames}
               confirmBabyNamesSubmit={this.state.confirmBabyNamesSubmit}
+              deleteBabyNames={this.deleteBabyNames}
               overrideBabyNameWarning={this.overrideBabyNameWarning}
               storeData={this.storeData}
               warnings={this.state.warnings}
@@ -2046,6 +2061,11 @@ class PageSelector extends Component {
               logout={this.logout}
               admin={this.state.admin}
             />
+          }
+          {/* reload */}
+          {this.state.admin !== true ? null :
+            <Alert bsStyle="success" className="menu-link text-center" onClick={this.getBabyNames}><a>Reload baby names.</a></Alert>
+
           }
           {/* User info message */}
           {!this.state.userInfo ? null :
