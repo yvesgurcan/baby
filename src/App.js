@@ -687,6 +687,7 @@ class CreateProfile extends Component {
         relationship: "Relation",
         relationshipLabel: "Quel est votre lien avec Yves et Ashlee ?",
         createProfile: "Créer votre profil",
+        deleteProfileButton: "Supprimer le profile"
       },
       en: {
         title: "Create your profile",
@@ -704,6 +705,7 @@ class CreateProfile extends Component {
         relationship: "Relationship",
         relationshipLabel: "How do you know Ashlee and Yves?",
         createProfile: "Create Profile",
+        deleteProfileButton: "Delete Profile"
       },
     }
   }
@@ -836,9 +838,94 @@ class CreateProfile extends Component {
       box1 = monthDropdown
       box2 = dayDropdown
     }
+
+    let dropdownListOfProfiles = null
+    if (this.props.admin === true && this.props.backgroundQueryReady && this.props.userProfiles) {
+      console.log(this.props.userProfiles)
+      dropdownListOfProfiles = this.props.userProfiles.map((user, index) => {
+        console.log(user)
+        return <option key={user.email} value={index}>{user.name} ({user.email})</option>
+      })
+    }
+
     return (
       <div>
         <div className="spacer-top-large"/>
+        {
+          this.props.admin !== true ? null
+          : !this.props.backgroundQueryReady ? <LocalSpinner/> :
+          <Col>
+            <Col sm={2} xs={12}>
+              <label style={{paddingTop: "12.5px"}}>User Profile: </label>
+            </Col>
+            <Col sm={10} xs={12}>
+              <FormControl
+                name="profiles"
+                /*value={this.props.gender}*/
+                componentClass="select"
+                bsSize="large"
+                className="margin-bottom"
+                onChange={this.props.switchProfile}
+                /*onKeyPress={this.autoSubmitForm}*/
+                disabled={this.props.admin !== true ? true : false}
+              >
+              {dropdownListOfProfiles}
+              </FormControl>
+            </Col>
+            <Clearfix/>
+            <hr/>
+          </Col>
+        }
+        {
+          this.props.admin !== true ? null :
+          <Col>
+            <Col sm={3} xs={12}>
+              <label>Created:&nbsp;</label>{this.props.created}
+            </Col>
+            <Col sm={3} xs={12}>
+              <label>Last login:&nbsp;</label>{this.props.lastLogin} ({this.props.lastSession})
+            </Col>
+            <Col sm={2} xs={12}>
+            <Checkbox
+                inline
+                name="profileComplete"
+                checked={this.props.firstLogin}
+                bsSize="large"
+                onChange={this.props.storeData}
+                onKeyPress={this.autoSubmitForm}
+                disabled={this.props.admin !== true ? true : false}
+              />
+              <label>First login</label>
+            </Col>
+            <Col sm={2} xs={12}>
+            <Checkbox
+                inline
+                name="profileComplete"
+                checked={this.props.profileComplete}
+                bsSize="large"
+                onChange={this.props.storeData}
+                onKeyPress={this.autoSubmitForm}
+                disabled={this.props.admin !== true ? true : false}
+              />
+              <label>Profile</label>
+            </Col>
+            <Col sm={2} xs={12}>
+            <Checkbox
+                inline
+                name="voted"
+                checked={this.props.voted}
+                bsSize="large"
+                onChange={this.props.storeData}
+                onKeyPress={this.autoSubmitForm}
+                disabled={this.props.admin !== true ? true : false}
+              />
+              <label>Voted</label>
+            </Col>
+            <Clearfix/>
+            <hr/>
+          </Col>
+        }
+        <Clearfix/>
         <Col sm={2}>
           <span className="hidden-xs">
             <FormControl
@@ -991,10 +1078,22 @@ class CreateProfile extends Component {
               block
               bsSize="large"
               bsStyle="primary"
+              className="margin-bottom"
               onClick={this.props.submitProfile}
             >
               {translation.createProfile}
             </Button>
+        </Col>
+        }
+        {this.props.admin !== true ? null :
+        <Col sm={12}>
+          <Button
+            block
+            bsSize="large"
+            bsStyle="danger"
+            className="margin-bottom"
+            onClick={this.props.deleteProfile}
+          >{translation.deleteProfileButton}</Button>
         </Col>
         }
         <div className="spacer-bottom-large"/>
@@ -1190,7 +1289,10 @@ class PageSelector extends Component {
     this.login = this.login.bind(this)
     this.logout = this.logout.bind(this)
     this.submitProfile = this.submitProfile.bind(this)
+    this.switchProfile = this.switchProfile.bind(this)
+    this.deleteProfile = this.deleteProfile.bind(this)
     this.getBabyNames = this.getBabyNames.bind(this)
+    this.reloadApp = this.reloadApp.bind(this)
     this.selectBabyName = this.selectBabyName.bind(this)
     this.overrideBabyNameWarning = this.overrideBabyNameWarning.bind(this)
     this.submitBabyNames = this.submitBabyNames.bind(this)
@@ -1481,11 +1583,22 @@ class PageSelector extends Component {
     this.setState({currentPage: input.target.id})
     delete this.state.userInfo
     delete this.state.errorMessage
+    if (this.state.admin === true && input.target.id === "createProfile") {
+      this.setState({adminEmail: this.state.email})
+      this.api(
+        "showProfiles",
+        {email: this.state.email},
+        "backgroundQuerySpinner"
+      )
+    }
+    else if (typeof this.state.adminEmail !== "undefined") {
+      this.setState({email: this.state.adminEmail})
+      delete this.state.adminEmail
+    }
   }
 
   // used on any page
   setUserInfoMessage(message) {
-    console.log("hello2")
     this.setState({userInfo: message})
   }
 
@@ -1610,6 +1723,26 @@ class PageSelector extends Component {
     }
   }
 
+  switchProfile(input) {
+    let profileNumber = input.target.value
+    let selectedProfile = this.state.userProfiles[profileNumber]
+    console.log(profileNumber,selectedProfile)
+    if (typeof selectedProfile.admin !== "undefined") {delete selectedProfile.admin}
+    if (typeof selectedProfile.authenticated !== "undefined") {delete selectedProfile.authenticated}
+    if (typeof selectedProfile.currentPage !== "undefined") {delete selectedProfile.currentPage}
+    this.setState(selectedProfile)
+  }
+
+  deleteProfile() {
+    this.api(
+      "deleteProfile",
+      {
+        email: this.state.email,
+      adminEmail: this.state.adminEmail
+      }
+    )
+  }
+
   // used on the ChooseBabyNames and ShowBabyNameStats pages
   getBabyNames() {
     this.api(
@@ -1617,6 +1750,16 @@ class PageSelector extends Component {
       {email: this.state.email},
       "backgroundQuerySpinner",
     )
+  }
+
+  reloadApp() {
+    this.api(
+      "auto-login",
+      {email: this.state.email},
+      true,
+      true
+    )
+    this.getBabyNames()
   }
 
   /* used on the ChooseBabyNames */
@@ -1778,7 +1921,7 @@ class PageSelector extends Component {
   }
 
   // API calls
-  api(request, data, spinner = true) {
+  api(request, data, spinner = true, filterOutCurrentPage = false) {
     // validate request
     if (typeof data === 'object' && typeof request === "string") {
         if (request.length && typeof data === "object") {
@@ -1816,6 +1959,10 @@ class PageSelector extends Component {
               this.setState({ready:true})
             }
             if (response != null && typeof response === "object") {
+              if (filterOutCurrentPage && typeof response.currentPage !== "undefined") {
+                delete response.currentPage
+                delete response.userInfo
+              }
               // saves response in the state
               this.setState(response)
               // parses birthday into year, month, and day
@@ -1982,8 +2129,22 @@ class PageSelector extends Component {
             storeData={this.storeData}
             errors={this.state.errors}
             submitProfile={this.submitProfile}
+            switchProfile={this.switchProfile}
+            deleteProfile={this.deleteProfile}
             profileComplete={this.state.profileComplete}
             admin={this.state.admin}
+            backgroundQueryReady={this.state.backgroundQueryReady}
+            userProfiles={this.state.userProfiles}
+            // admin profiles
+            created={this.state.created}
+            firstLogin={this.state.firstLogin}
+            lastLogin={this.state.lastLogin}
+            lastSession={this.state.lastSession}
+            // authenticated={this.state.authenticated}
+            // currentPage={this.state.currentPage}
+            voted={this.state.voted}
+            profileComplete={this.state.profileComplete}
+            language={this.state.language}
           />
         )
         break
@@ -2064,7 +2225,7 @@ class PageSelector extends Component {
           }
           {/* reload */}
           {this.state.admin !== true ? null :
-            <Alert bsStyle="success" className="menu-link text-center" onClick={this.getBabyNames}><a>Reload baby names.</a></Alert>
+            <Alert bsStyle="success" className="menu-link text-center" onClick={this.reloadApp}><a>Reload the App</a></Alert>
 
           }
           {/* User info message */}
