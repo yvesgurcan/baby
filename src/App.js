@@ -690,8 +690,9 @@ class CreateProfile extends Component {
         relationship: "Relation",
         relationshipLabel: "Quel est votre lien avec Yves et Ashlee ?",
         createProfile: "Créer votre profil",
-        deleteProfileButton: "Supprimer le profile",
+        deleteProfileButton: "Supprimer le profil",
         adminUpdateProfile: "Mettre le profil à jour",
+        adminNewProfile: "Créer un nouveau profil",
       },
       en: {
         title: "Create your profile",
@@ -711,6 +712,7 @@ class CreateProfile extends Component {
         createProfile: "Create Profile",
         deleteProfileButton: "Delete Profile",
         adminUpdateProfile: "Update Profile",
+        adminNewProfile: "Create New Profile",
       },
     }
   }
@@ -982,10 +984,13 @@ class CreateProfile extends Component {
         </Col>
         <Col sm={5}>
           <FormControl
-            disabled={true}
+            name="email"
+            disabled={this.props.admin !== true ? true : false}
             value={this.props.email ? this.props.email : ""}
             bsSize="large"
             className="margin-bottom"
+            onChange={this.props.storeData}
+            onKeyPress={this.autoSubmitForm}
           />
         </Col>
         <Row>
@@ -1086,7 +1091,13 @@ class CreateProfile extends Component {
               className="margin-bottom"
               onClick={this.props.admin === true ? this.props.adminUpdateProfile : this.props.submitProfile}
             >
-              {this.props.admin === true ? translation.adminUpdateProfile : translation.createProfile}
+              {
+                this.props.admin === true      
+                  ? !this.props.originalEmail || this.props.originalEmail === this.props.email
+                    ? translation.adminUpdateProfile
+                    : translation.adminNewProfile
+                  : translation.createProfile
+              }
             </Button>
         </Col>
         }
@@ -1786,6 +1797,9 @@ class PageSelector extends Component {
     if (typeof selectedProfile.currentPage !== "undefined") {delete selectedProfile.currentPage}
     // if user does not have a name, replace it by an empty string
     if (typeof selectedProfile.name === "undefined") {selectedProfile.name = ""}
+    // store the current email address of the user
+    // used to signify that admin will create a new user if they change the email address
+    selectedProfile.originalEmail = selectedProfile.email
     this.setState(selectedProfile)
   }
 
@@ -2210,14 +2224,14 @@ class PageSelector extends Component {
             admin={this.state.admin}
             backgroundQueryReady={this.state.backgroundQueryReady}
             userProfiles={this.state.userProfiles}
-            // admin profiles
+            // profile editing for the admin
             created={this.state.created}
             firstLogin={this.state.firstLogin}
             lastLogin={this.state.lastLogin}
             lastSession={this.state.lastSession}
-            // authenticated={this.state.authenticated}
             // currentPage={this.state.currentPage}
             voted={this.state.voted}
+            originalEmail={this.state.originalEmail}
           />
         )
         break
