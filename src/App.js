@@ -3,37 +3,37 @@ import {Button, FormControl, Col, Grid, PageHeader, Clearfix, Alert, Row, Checkb
 import $ from 'jquery'
 import './App.css';
 
+/* default state */
+
 const currentYear = new Date().getFullYear()
 
-// default state
 // all these values can be modified at will, the App should handle gracefully any unexpected or weird value
 const defaultState = {
-      email: "gurcan.yves@gmail.com",
-      language: "de",
-      languageChoices: ["en","fr"],
-      gender: "F",
-      genderChoices: ["F","M"],
-      day: 1,
-      month: "January",
-      year: 1960,
-      minYear: Math.floor((currentYear - 80) / 5) * 5,
-      maxYear: Math.ceil((currentYear - 15) / 5) * 5,
-      hideBirthday: false,
-      "age-category": "50-74",
-      ageCategoryChoices: ["24-","25-49","50-74","75+"],
-      country: "usa",
-      countryChoices: ["usa","france"],
-      relationship: "relative",
-      relationshipChoices: ["relative","friend","coworker"],
-      maxNewBabyNames: 3,
-      maxSelectableBabyNames: 5,
-      minBabyNameSize: 4,
-      maxBabyNameSize: 18,
+  language: "fr",
+  languageChoices: ["en","fr"],
+  gender: "M",
+  genderChoices: ["F","M"],
+  day: 1,
+  month: "January",
+  year: 1960,
+  minYear: Math.floor((currentYear - 80) / 5) * 5,
+  maxYear: Math.ceil((currentYear - 15) / 5) * 5,
+  hideBirthday: false,
+  "age-category": "50-74",
+  ageCategoryChoices: ["24-","25-49","50-74","75+"],
+  country: "usa",
+  countryChoices: ["usa","france"],
+  relationship: "relative",
+  relationshipChoices: ["relative","friend","coworker"],
+  maxNewBabyNames: 3,
+  maxSelectableBabyNames: 5,
+  minBabyNameSize: 4,
+  maxBabyNameSize: 18,
 }
 
 const defaultBabyNameNumbers = {}
 
-/* spinner */
+/* spinners */
 
 class LocalSpinner extends Component {
   render () {
@@ -60,6 +60,7 @@ class PageSpinner extends Component {
 }
 
 /* SVGs */
+/* flags */
 
 class FrenchFlag extends Component {
   render() {
@@ -82,101 +83,103 @@ class FrenchFlag extends Component {
 class AmericanFlag extends Component {
   render() {
     return (
-                        <svg
-                          id="en"
-                          width={this.props.mainPage ? "200" : "50"}
-                          height={this.props.mainPage ? "100" : "25"}
-                          viewBox="0 0 43 26"
-                        >
-                            <rect width="42" height="2"  fill="crimson"></rect>
-                            <rect width="42" height="2"  y="4" fill="crimson"></rect>
-                            <rect width="42" height="2"  y="8" fill="crimson"></rect>
-                            <rect width="42" height="2"  y="12" fill="crimson"></rect>
-                            <rect width="42" height="2"  y="16" fill="crimson"></rect>
-                            <rect width="42" height="2"  y="20" fill="crimson"></rect>
-                            <rect width="42" height="2"  y="24" fill="crimson"></rect>
-                            <rect width="14" height="14" fill="darkblue"></rect>
-                            <rect width="42" height="26" fill="transparent" stroke="darkgray"></rect>
-                            <rect width="1" height="1" x="0.75" y="0.75" fill="white"></rect>
-                            <rect width="1" height="1" x="2.75" y="0.75" fill="white"></rect>
-                            <rect width="1" height="1" x="4.75" y="0.75" fill="white"></rect>
-                            <rect width="1" height="1" x="6.75" y="0.75" fill="white"></rect>
-                            <rect width="1" height="1" x="8.75" y="0.75" fill="white"></rect>
-                            <rect width="1" height="1" x="10.75" y="0.75" fill="white"></rect>
-                            <rect width="1" height="1" x="12.75" y="0.75" fill="white"></rect>
-                            <rect width="1" height="1" x="0.75" y="2.75" fill="white"></rect>
-                            <rect width="1" height="1" x="2.75" y="2.75" fill="white"></rect>
-                            <rect width="1" height="1" x="4.75" y="2.75" fill="white"></rect>
-                            <rect width="1" height="1" x="6.75" y="2.75" fill="white"></rect>
-                            <rect width="1" height="1" x="8.75" y="2.75" fill="white"></rect>
-                            <rect width="1" height="1" x="10.75" y="2.75" fill="white"></rect>
-                            <rect width="1" height="1" x="12.75" y="2.75" fill="white"></rect>
-                            <rect width="1" height="1" x="0.75" y="4.75" fill="white"></rect>
-                            <rect width="1" height="1" x="2.75" y="4.75" fill="white"></rect>
-                            <rect width="1" height="1" x="4.75" y="4.75" fill="white"></rect>
-                            <rect width="1" height="1" x="6.75" y="4.75" fill="white"></rect>
-                            <rect width="1" height="1" x="8.75" y="4.75" fill="white"></rect>
-                            <rect width="1" height="1" x="10.75" y="4.75" fill="white"></rect>
-                            <rect width="1" height="1" x="12.75" y="4.75" fill="white"></rect>
-                            <rect width="1" height="1" x="0.75" y="6.75" fill="white"></rect>
-                            <rect width="1" height="1" x="2.75" y="6.75" fill="white"></rect>
-                            <rect width="1" height="1" x="4.75" y="6.75" fill="white"></rect>
-                            <rect width="1" height="1" x="6.75" y="6.75" fill="white"></rect>
-                            <rect width="1" height="1" x="8.75" y="6.75" fill="white"></rect>
-                            <rect width="1" height="1" x="10.75" y="6.75" fill="white"></rect>
-                            <rect width="1" height="1" x="12.75" y="6.75" fill="white"></rect>
-                            <rect width="1" height="1" x="0.75" y="8.75" fill="white"></rect>
-                            <rect width="1" height="1" x="2.75" y="8.75" fill="white"></rect>
-                            <rect width="1" height="1" x="4.75" y="8.75" fill="white"></rect>
-                            <rect width="1" height="1" x="6.75" y="8.75" fill="white"></rect>
-                            <rect width="1" height="1" x="8.75" y="8.75" fill="white"></rect>
-                            <rect width="1" height="1" x="10.75" y="8.75" fill="white"></rect>
-                            <rect width="1" height="1" x="12.75" y="8.75" fill="white"></rect>
-                            <rect width="1" height="1" x="0.75" y="10.75" fill="white"></rect>
-                            <rect width="1" height="1" x="2.75" y="10.75" fill="white"></rect>
-                            <rect width="1" height="1" x="4.75" y="10.75" fill="white"></rect>
-                            <rect width="1" height="1" x="6.75" y="10.75" fill="white"></rect>
-                            <rect width="1" height="1" x="8.75" y="10.75" fill="white"></rect>
-                            <rect width="1" height="1" x="10.75" y="10.75" fill="white"></rect>
-                            <rect width="1" height="1" x="12.75" y="10.75" fill="white"></rect>
-                            <rect width="1" height="1" x="0.75" y="12.75" fill="white"></rect>
-                            <rect width="1" height="1" x="2.75" y="12.75" fill="white"></rect>
-                            <rect width="1" height="1" x="4.75" y="12.75" fill="white"></rect>
-                            <rect width="1" height="1" x="6.75" y="12.75" fill="white"></rect>
-                            <rect width="1" height="1" x="8.75" y="12.75" fill="white"></rect>
-                            <rect width="1" height="1" x="10.75" y="12.75" fill="white"></rect>
-                            <rect width="1" height="1" x="12.75" y="12.75" fill="white"></rect>
-                        </svg>
+      <svg
+        id="en"
+        width={this.props.mainPage ? "200" : "50"}
+        height={this.props.mainPage ? "100" : "25"}
+        viewBox="0 0 43 26"
+      >
+        <rect width="42" height="2" fill="crimson"></rect>
+        <rect width="42" height="2" y="4" fill="crimson"></rect>
+        <rect width="42" height="2" y="8" fill="crimson"></rect>
+        <rect width="42" height="2" y="12" fill="crimson"></rect>
+        <rect width="42" height="2" y="16" fill="crimson"></rect>
+        <rect width="42" height="2" y="20" fill="crimson"></rect>
+        <rect width="42" height="2" y="24" fill="crimson"></rect>
+        <rect width="14" height="14" fill="darkblue"></rect>
+        <rect width="42" height="26" fill="transparent" stroke="darkgray"></rect>
+        <rect width="1" height="1" x="0.75" y="0.75" fill="white"></rect>
+        <rect width="1" height="1" x="2.75" y="0.75" fill="white"></rect>
+        <rect width="1" height="1" x="4.75" y="0.75" fill="white"></rect>
+        <rect width="1" height="1" x="6.75" y="0.75" fill="white"></rect>
+        <rect width="1" height="1" x="8.75" y="0.75" fill="white"></rect>
+        <rect width="1" height="1" x="10.75" y="0.75" fill="white"></rect>
+        <rect width="1" height="1" x="12.75" y="0.75" fill="white"></rect>
+        <rect width="1" height="1" x="0.75" y="2.75" fill="white"></rect>
+        <rect width="1" height="1" x="2.75" y="2.75" fill="white"></rect>
+        <rect width="1" height="1" x="4.75" y="2.75" fill="white"></rect>
+        <rect width="1" height="1" x="6.75" y="2.75" fill="white"></rect>
+        <rect width="1" height="1" x="8.75" y="2.75" fill="white"></rect>
+        <rect width="1" height="1" x="10.75" y="2.75" fill="white"></rect>
+        <rect width="1" height="1" x="12.75" y="2.75" fill="white"></rect>
+        <rect width="1" height="1" x="0.75" y="4.75" fill="white"></rect>
+        <rect width="1" height="1" x="2.75" y="4.75" fill="white"></rect>
+        <rect width="1" height="1" x="4.75" y="4.75" fill="white"></rect>
+        <rect width="1" height="1" x="6.75" y="4.75" fill="white"></rect>
+        <rect width="1" height="1" x="8.75" y="4.75" fill="white"></rect>
+        <rect width="1" height="1" x="10.75" y="4.75" fill="white"></rect>
+        <rect width="1" height="1" x="12.75" y="4.75" fill="white"></rect>
+        <rect width="1" height="1" x="0.75" y="6.75" fill="white"></rect>
+        <rect width="1" height="1" x="2.75" y="6.75" fill="white"></rect>
+        <rect width="1" height="1" x="4.75" y="6.75" fill="white"></rect>
+        <rect width="1" height="1" x="6.75" y="6.75" fill="white"></rect>
+        <rect width="1" height="1" x="8.75" y="6.75" fill="white"></rect>
+        <rect width="1" height="1" x="10.75" y="6.75" fill="white"></rect>
+        <rect width="1" height="1" x="12.75" y="6.75" fill="white"></rect>
+        <rect width="1" height="1" x="0.75" y="8.75" fill="white"></rect>
+        <rect width="1" height="1" x="2.75" y="8.75" fill="white"></rect>
+        <rect width="1" height="1" x="4.75" y="8.75" fill="white"></rect>
+        <rect width="1" height="1" x="6.75" y="8.75" fill="white"></rect>
+        <rect width="1" height="1" x="8.75" y="8.75" fill="white"></rect>
+        <rect width="1" height="1" x="10.75" y="8.75" fill="white"></rect>
+        <rect width="1" height="1" x="12.75" y="8.75" fill="white"></rect>
+        <rect width="1" height="1" x="0.75" y="10.75" fill="white"></rect>
+        <rect width="1" height="1" x="2.75" y="10.75" fill="white"></rect>
+        <rect width="1" height="1" x="4.75" y="10.75" fill="white"></rect>
+        <rect width="1" height="1" x="6.75" y="10.75" fill="white"></rect>
+        <rect width="1" height="1" x="8.75" y="10.75" fill="white"></rect>
+        <rect width="1" height="1" x="10.75" y="10.75" fill="white"></rect>
+        <rect width="1" height="1" x="12.75" y="10.75" fill="white"></rect>
+        <rect width="1" height="1" x="0.75" y="12.75" fill="white"></rect>
+        <rect width="1" height="1" x="2.75" y="12.75" fill="white"></rect>
+        <rect width="1" height="1" x="4.75" y="12.75" fill="white"></rect>
+        <rect width="1" height="1" x="6.75" y="12.75" fill="white"></rect>
+        <rect width="1" height="1" x="8.75" y="12.75" fill="white"></rect>
+        <rect width="1" height="1" x="10.75" y="12.75" fill="white"></rect>
+        <rect width="1" height="1" x="12.75" y="12.75" fill="white"></rect>
+      </svg>
     )
   }
 }
 
+/* mushrooms */
+
 class RedMushroom extends Component {
   render() {
     return (
-                  <svg viewBox="0 -10 570 220">
-                    {/* mushroom 1 */}
-                    {/* hat */}
-                    <circle cx="110" cy="100" r="100" clipPath="url(#cut-off-bottom-mushroom1)" fill="red" stroke="black" strokeWidth="3"></circle>
-                    <clipPath id="cut-off-bottom-mushroom1"><rect x="0" y="-10" width="220" height="100" /></clipPath>
-                    {/* spots on the hat */}
-                    <circle cx="30" cy="35" r="18" fill="white" stroke="none"></circle>
-                    <circle cx="75" cy="65" r="15" fill="white" stroke="none"></circle>
-                    <circle cx="122" cy="21" r="12" fill="white" stroke="none"></circle>
-                    <circle cx="145" cy="75" r="18" fill="white" stroke="none"></circle>
-                    <circle cx="190" cy="50" r="13" fill="white" stroke="none"></circle>
-                    {/* close the circle */}
-                    <circle cx="110" cy="100" r="100" clipPath="url(#cut-off-bottom-mushroom1)" fill="none" stroke="black" strokeWidth="3"></circle>
-                    <line x1="9.15" y1="90" x2="210.85" y2="90" stroke="black" strokeWidth="3"></line>
-                    {/* body */}
-                    <rect width="120" height="100" x="50" y="90" rx="2" ry="2" fill="none" stroke="black" strokeWidth="3"></rect>
-                    {/* eyes */}
-                    <line x1="95" y1="110" x2="95" y2="140" stroke="black" strokeWidth="4"></line>
-                    <line x1="125" y1="110" x2="125" y2="140" stroke="black" strokeWidth="4"></line>
-                    {/* mouth */}
-                    <circle cx="110" cy="145" r="30" clipPath="url(#cut-off-top-mushroom1)" fill="none" stroke="black" strokeWidth="3"></circle>
-                    <clipPath id="cut-off-top-mushroom1"><rect x="0" y="145" width="220" height="100" /></clipPath>
-                  </svg>
+      <svg viewBox="0 -10 570 220">
+        {/* mushroom 1 */}
+        {/* hat */}
+        <circle cx="110" cy="100" r="100" clipPath="url(#cut-off-bottom-mushroom1)" fill="red" stroke="black" strokeWidth="3"></circle>
+        <clipPath id="cut-off-bottom-mushroom1"><rect x="0" y="-10" width="220" height="100" /></clipPath>
+        {/* spots on the hat */}
+        <circle cx="30" cy="35" r="18" fill="white" stroke="none"></circle>
+        <circle cx="75" cy="65" r="15" fill="white" stroke="none"></circle>
+        <circle cx="122" cy="21" r="12" fill="white" stroke="none"></circle>
+        <circle cx="145" cy="75" r="18" fill="white" stroke="none"></circle>
+        <circle cx="190" cy="50" r="13" fill="white" stroke="none"></circle>
+        {/* close the circle */}
+        <circle cx="110" cy="100" r="100" clipPath="url(#cut-off-bottom-mushroom1)" fill="none" stroke="black" strokeWidth="3"></circle>
+        <line x1="9.15" y1="90" x2="210.85" y2="90" stroke="black" strokeWidth="3"></line>
+        {/* body */}
+        <rect width="120" height="100" x="50" y="90" rx="2" ry="2" fill="none" stroke="black" strokeWidth="3"></rect>
+        {/* eyes */}
+        <line x1="95" y1="110" x2="95" y2="140" stroke="black" strokeWidth="4"></line>
+        <line x1="125" y1="110" x2="125" y2="140" stroke="black" strokeWidth="4"></line>
+        {/* mouth */}
+        <circle cx="110" cy="145" r="30" clipPath="url(#cut-off-top-mushroom1)" fill="none" stroke="black" strokeWidth="3"></circle>
+        <clipPath id="cut-off-top-mushroom1"><rect x="0" y="145" width="220" height="100" /></clipPath>
+      </svg>
     )
   }
 }
@@ -184,30 +187,30 @@ class RedMushroom extends Component {
 class GreenMushroom extends Component {
   render() {
     return (
-                  <svg height={this.props.header ? "60" : null} width={this.props.header ? "60" : null} viewBox={this.props.header ? "215 80 140 160" : "0 0 570 220"}>
-                    {/* mushroom 2 */}
-                    {/* hat */}
-                    <circle cx="285" cy="150" r="65" clipPath="url(#cut-off-bottom-mushroom2)" fill="lightgreen" stroke="black" strokeWidth="3"></circle>
-                    <clipPath id="cut-off-bottom-mushroom2"><rect x="110" y="0" width="245" height="145" /></clipPath>
-                    {/* spots on the hat */}
-                    <circle cx="230" cy="125" r="11" fill="white" stroke="none"></circle>
-                    <circle cx="265" cy="140" r="7" fill="white" stroke="none"></circle>
-                    <circle cx="295" cy="105" r="12" fill="white" stroke="none"></circle>
-                    <circle cx="326" cy="126" r="9" fill="white" stroke="none"></circle>
-                    {/* close the circle */}
-                    <circle cx="285" cy="150" r="65" clipPath="url(#cut-off-bottom-mushroom2)" fill="none" stroke="black" strokeWidth="3"></circle>
-                    <line x1="219.15" y1="145" x2="350.85" y2="145" stroke="black" strokeWidth="3"></line>
-                    {/* body */}
-                    <rect width="70" height="50" x="250" y="145" rx="2" ry="2" fill="none" stroke="black" strokeWidth="3"></rect>
-                    {/* eyes */}
-                    <line x1="263" y1="165" x2="273" y2="155" stroke="black" strokeWidth="4"></line>
-                    <line x1="271" y1="155" x2="281" y2="165" stroke="black" strokeWidth="4"></line>
-                    <line x1="288" y1="165" x2="298" y2="155" stroke="black" strokeWidth="4"></line>
-                    <line x1="296" y1="155" x2="306" y2="165" stroke="black" strokeWidth="4"></line>
-                    {/* mouth */}
-                    <line x1="276" y1="175" x2="286" y2="185" stroke="black" strokeWidth="4"></line>
-                    <line x1="284" y1="185" x2="294" y2="175" stroke="black" strokeWidth="4"></line>
-                  </svg>
+      <svg height={this.props.header ? "60" : null} width={this.props.header ? "60" : null} viewBox={this.props.header ? "215 80 140 160" : "0 0 570 220"}>
+        {/* mushroom 2 */}
+        {/* hat */}
+        <circle cx="285" cy="150" r="65" clipPath="url(#cut-off-bottom-mushroom2)" fill="lightgreen" stroke="black" strokeWidth="3"></circle>
+        <clipPath id="cut-off-bottom-mushroom2"><rect x="110" y="0" width="245" height="145" /></clipPath>
+        {/* spots on the hat */}
+        <circle cx="230" cy="125" r="11" fill="white" stroke="none"></circle>
+        <circle cx="265" cy="140" r="7" fill="white" stroke="none"></circle>
+        <circle cx="295" cy="105" r="12" fill="white" stroke="none"></circle>
+        <circle cx="326" cy="126" r="9" fill="white" stroke="none"></circle>
+        {/* close the circle */}
+        <circle cx="285" cy="150" r="65" clipPath="url(#cut-off-bottom-mushroom2)" fill="none" stroke="black" strokeWidth="3"></circle>
+        <line x1="219.15" y1="145" x2="350.85" y2="145" stroke="black" strokeWidth="3"></line>
+        {/* body */}
+        <rect width="70" height="50" x="250" y="145" rx="2" ry="2" fill="none" stroke="black" strokeWidth="3"></rect>
+        {/* eyes */}
+        <line x1="263" y1="165" x2="273" y2="155" stroke="black" strokeWidth="4"></line>
+        <line x1="271" y1="155" x2="281" y2="165" stroke="black" strokeWidth="4"></line>
+        <line x1="288" y1="165" x2="298" y2="155" stroke="black" strokeWidth="4"></line>
+        <line x1="296" y1="155" x2="306" y2="165" stroke="black" strokeWidth="4"></line>
+        {/* mouth */}
+        <line x1="276" y1="175" x2="286" y2="185" stroke="black" strokeWidth="4"></line>
+        <line x1="284" y1="185" x2="294" y2="175" stroke="black" strokeWidth="4"></line>
+      </svg>
     )
   }
 }
@@ -215,29 +218,29 @@ class GreenMushroom extends Component {
 class OrangeMushroom extends Component {
   render() {
     return (
-                  <svg viewBox="0 -10 570 220">
-                    {/* mushroom 3 */}
-                    {/* hat */}
-                    <circle cx="460" cy="100" r="100" clipPath="url(#cut-off-bottom-mushroom3)" fill="orange" stroke="black" strokeWidth="3"></circle>
-                    <clipPath id="cut-off-bottom-mushroom3"><rect x="100" y="-10" width="470" height="100" /></clipPath>
-                    {/* spots on the hat */}
-                    <circle cx="390" cy="70" r="13" fill="white" stroke="none"></circle>
-                    <circle cx="430" cy="25" r="19" fill="white" stroke="none"></circle>
-                    <circle cx="475" cy="65" r="15" fill="white" stroke="none"></circle>
-                    <circle cx="522" cy="21" r="12" fill="white" stroke="none"></circle>
-                    <circle cx="548" cy="77" r="18" fill="white" stroke="none"></circle>
-                    {/* close the circle */}
-                    <circle cx="460" cy="100" r="100" clipPath="url(#cut-off-bottom-mushroom3)" fill="none" stroke="black" strokeWidth="3"></circle>
-                    <line x1="359.15" y1="90" x2="560.85" y2="90" stroke="black" strokeWidth="3"></line>
-                    {/* body */}
-                    <rect width="120" height="100" x="400" y="90" rx="2" ry="2" fill="none" stroke="black" strokeWidth="3"></rect>
-                    {/* eyes */}
-                    <line x1="445" y1="110" x2="445" y2="140" stroke="black" strokeWidth="4"></line>
-                    <line x1="475" y1="110" x2="475" y2="140" stroke="black" strokeWidth="4"></line>
-                    {/* mouth */}
-                    <circle cx="460" cy="145" r="30" clipPath="url(#cut-off-top-mushroom3)" fill="none" stroke="black" strokeWidth="3"></circle>
-                    <clipPath id="cut-off-top-mushroom3"><rect x="400" y="145" width="220" height="100" /></clipPath>
-                  </svg>
+      <svg viewBox="0 -10 570 220">
+        {/* mushroom 3 */}
+        {/* hat */}
+        <circle cx="460" cy="100" r="100" clipPath="url(#cut-off-bottom-mushroom3)" fill="orange" stroke="black" strokeWidth="3"></circle>
+        <clipPath id="cut-off-bottom-mushroom3"><rect x="100" y="-10" width="470" height="100" /></clipPath>
+        {/* spots on the hat */}
+        <circle cx="390" cy="70" r="13" fill="white" stroke="none"></circle>
+        <circle cx="430" cy="25" r="19" fill="white" stroke="none"></circle>
+        <circle cx="475" cy="65" r="15" fill="white" stroke="none"></circle>
+        <circle cx="522" cy="21" r="12" fill="white" stroke="none"></circle>
+        <circle cx="548" cy="77" r="18" fill="white" stroke="none"></circle>
+        {/* close the circle */}
+        <circle cx="460" cy="100" r="100" clipPath="url(#cut-off-bottom-mushroom3)" fill="none" stroke="black" strokeWidth="3"></circle>
+        <line x1="359.15" y1="90" x2="560.85" y2="90" stroke="black" strokeWidth="3"></line>
+        {/* body */}
+        <rect width="120" height="100" x="400" y="90" rx="2" ry="2" fill="none" stroke="black" strokeWidth="3"></rect>
+        {/* eyes */}
+        <line x1="445" y1="110" x2="445" y2="140" stroke="black" strokeWidth="4"></line>
+        <line x1="475" y1="110" x2="475" y2="140" stroke="black" strokeWidth="4"></line>
+        {/* mouth */}
+        <circle cx="460" cy="145" r="30" clipPath="url(#cut-off-top-mushroom3)" fill="none" stroke="black" strokeWidth="3"></circle>
+        <clipPath id="cut-off-top-mushroom3"><rect x="400" y="145" width="220" height="100" /></clipPath>
+      </svg>
     )
   }
 }
@@ -289,22 +292,22 @@ class Header extends Component {
         <Col xs={10}  style={{marginTop: "22.5px", paddingRight: "0px"}} className="text-right">
           <span><a id="announcement" className="menu-link" onClick={this.props.switchCurrentPage}>{translation.announcement}</a> | </span>
           {
-            (!this.props.firstLogin || this.props.profileComplete || this.props.currentPage === "createProfile")
+            ((!this.props.firstLogin || this.props.profileComplete || this.props.currentPage === "createProfile") || this.props.admin === true)
               ? <span><a id="createProfile" className="menu-link" onClick={this.props.switchCurrentPage}>{translation.createProfile}</a> | </span>
               : null
           }
           {
-            (this.props.profileComplete && !this.props.voted)
+            ((this.props.profileComplete && !this.props.voted) && this.props.admin !== true)
             ? <span><a id="chooseBabyNames" className="menu-link" onClick={this.props.switchCurrentPage}>{translation.chooseBabyNames}</a> | </span>
             : null
           }
           {
-            (this.props.admin)
+            (this.props.admin === true)
             ? <span><a id="chooseBabyNames" className="menu-link" onClick={this.props.switchCurrentPage}>Votes</a> | </span>
             : null
           }
           {
-            (this.props.profileComplete && this.props.voted)
+            ((this.props.profileComplete && this.props.voted) || this.props.admin === true)
             ? <span><a id="showBabyNameStats" className="menu-link" onClick={this.props.switchCurrentPage}>{translation.chooseBabyNames}</a> | </span>
             : null
           }
@@ -330,7 +333,7 @@ class Footer extends Component {
   }
 }
 
-/* pages main content */
+/* page main content */
 
 class ShowBabyNameStats extends Component {
   translation() {
@@ -687,7 +690,8 @@ class CreateProfile extends Component {
         relationship: "Relation",
         relationshipLabel: "Quel est votre lien avec Yves et Ashlee ?",
         createProfile: "Créer votre profil",
-        deleteProfileButton: "Supprimer le profile"
+        deleteProfileButton: "Supprimer le profile",
+        adminUpdateProfile: "Mettre le profil à jour",
       },
       en: {
         title: "Create your profile",
@@ -705,7 +709,8 @@ class CreateProfile extends Component {
         relationship: "Relationship",
         relationshipLabel: "How do you know Ashlee and Yves?",
         createProfile: "Create Profile",
-        deleteProfileButton: "Delete Profile"
+        deleteProfileButton: "Delete Profile",
+        adminUpdateProfile: "Update Profile",
       },
     }
   }
@@ -841,10 +846,10 @@ class CreateProfile extends Component {
 
     let dropdownListOfProfiles = null
     if (this.props.admin === true && this.props.backgroundQueryReady && this.props.userProfiles) {
-      console.log(this.props.userProfiles)
+      // console.log(this.props.userProfiles)
       dropdownListOfProfiles = this.props.userProfiles.map((user, index) => {
-        console.log(user)
-        return <option key={user.email} value={index}>{user.name} ({user.email})</option>
+        // console.log(user)
+        return <option key={user.email + index} value={index}>{user.name} ({user.email})</option>
       })
     }
 
@@ -888,7 +893,7 @@ class CreateProfile extends Component {
             <Col sm={2} xs={12}>
             <Checkbox
                 inline
-                name="profileComplete"
+                name="firstLogin"
                 checked={this.props.firstLogin}
                 bsSize="large"
                 onChange={this.props.storeData}
@@ -1079,9 +1084,9 @@ class CreateProfile extends Component {
               bsSize="large"
               bsStyle="primary"
               className="margin-bottom"
-              onClick={this.props.submitProfile}
+              onClick={this.props.admin === true ? this.props.adminUpdateProfile : this.props.submitProfile}
             >
-              {translation.createProfile}
+              {this.props.admin === true ? translation.adminUpdateProfile : translation.createProfile}
             </Button>
         </Col>
         }
@@ -1290,6 +1295,7 @@ class PageSelector extends Component {
     this.logout = this.logout.bind(this)
     this.submitProfile = this.submitProfile.bind(this)
     this.switchProfile = this.switchProfile.bind(this)
+    this.adminUpdateProfile = this.adminUpdateProfile.bind(this)
     this.deleteProfile = this.deleteProfile.bind(this)
     this.getBabyNames = this.getBabyNames.bind(this)
     this.reloadApp = this.reloadApp.bind(this)
@@ -1303,7 +1309,7 @@ class PageSelector extends Component {
 
     const URLfragments = this.URLfragments()
 
-    // check URL language
+    // check language in URL
     let language = URLfragments.language 
     if (!language) {
       language = defaultState.languageChoices[0]
@@ -1315,19 +1321,19 @@ class PageSelector extends Component {
     // see top of this page to customize the state of the App
     let defaultUserState = defaultState
     defaultUserState.language = language
+    defaultUserState.currentPage = URLfragments.language ? "login" : null
     defaultUserState.email = URLfragments.email ? URLfragments.email : null
     defaultUserState.name = URLfragments.name ? URLfragments.name : ""
-    defaultUserState.currentPage = URLfragments.language ? "login" : null
     defaultUserState.selectedBabyNames = ""
-    defaultUserState.errors = {}
-    defaultUserState.warnings =  {}
-    defaultUserState.ready = true
-    defaultUserState.backgroundQueryReady = true
     defaultUserState.babyNames = []
     defaultUserState.genderChoices.push("allGender")
     defaultUserState.ageCategoryChoices.push("allAgeCategories")
     defaultUserState.countryChoices.push("allCountries")
     defaultUserState.relationshipChoices.push("allRelationships")
+    defaultUserState.errors = {}
+    defaultUserState.warnings =  {}
+    defaultUserState.ready = true
+    defaultUserState.backgroundQueryReady = true
 
     // check default max number of new baby names
     const arbitraryMaxNewBabyNames = 3
@@ -1398,27 +1404,29 @@ class PageSelector extends Component {
   }
 
   // try to maintain user session if still authenticated and load baby names silently
+  // get email from URL or from the state
   componentDidMount() {
     if (this.state.currentPage === "login" && this.state.email !== null) {
       const URLfragments = this.URLfragments()
       let that = this
-      // wait a millisecond to receive auto-fill input from the user's browser
+      // wait a very small amount of time to receive auto-fill input from the user's browser
       setTimeout(
         function() {
           that.api(
             "auto-login",
             {email: URLfragments.email ? URLfragments.email : that.state.email},
+            true,
+            false,
             true)
           that.state.email !== "" ? that.getBabyNames() : null
         },
         100)
     }
-    // triggers the state check manually
+    // trigge the state check manually
     this.componentDidUpdate()
   }
 
-  // catch any weird change to the state at any point
-  // populates the state with default data
+  // catch any weird change to the state when it changes
   componentDidUpdate(prevProps,prevState) {
     var fallback = null
 
@@ -1453,6 +1461,7 @@ class PageSelector extends Component {
       this.storeRawData({gender: fallback})
       console.warn("Incorrect gender '" + this.state.gender + "' was replaced by fallback '" + fallback + "'.")
     }
+
     // check year range
     let minYear = this.state.minYear
     let maxYear = this.state.maxYear
@@ -1462,6 +1471,7 @@ class PageSelector extends Component {
       minYear = maxYear
       maxYear = minYear
     }
+
     // check year
     if (this.state.year > maxYear) {
       fallback = maxYear
@@ -1474,6 +1484,7 @@ class PageSelector extends Component {
       console.warn("Out of range year '" + this.state.year + "' was replaced by minimum year fallback '" + fallback + "'.")
 
     }
+
     // check month
     const month = {"January":1,"February":2,"March":3,"April":4,"May":5,"June":6,"July":7,"August":8,"September":9,"October":10,"November":11,"December":12}
     const monthShort = {"Jan":1,"Feb":2,"Mar":3,"Apr":4,"May":5,"Jun":6,"Jul":7,"Aug":8,"Sep":9,"Oct":10,"Nov":11,"Dec":12}
@@ -1492,6 +1503,7 @@ class PageSelector extends Component {
       this.storeRawData({month: fallback})
       console.warn("Invalid month '" + this.state.month + "' was replaced by fallback '" + fallback + "'.")
     }
+
     // check day
     let totalDaysInCurrentMonth = new Date(this.state.year, this.state.month, 0).getDate()
     if (isNaN(this.state.day) || this.state.day < 0 || this.state.day > totalDaysInCurrentMonth) {
@@ -1499,24 +1511,28 @@ class PageSelector extends Component {
       this.storeRawData({day: fallback})
       console.warn("Invalid day '" + this.state.day + "' was replaced by fallback '" + fallback + "'.")
     }
+
     // check hideBirthday
     if (this.state.hideBirthday !== true && this.state.hideBirthday !== false) {
       fallback = true
       this.storeRawData({hideBirthday: fallback})
       console.warn("Invalid hideBirthday '" + this.state.hideBirthday + "' was replaced by fallback '" + fallback + "'.")
     }
+
     // check age-category
     if (this.state.ageCategoryChoices.indexOf(this.state["age-category"]) === -1) {
       fallback = this.state.ageCategoryChoices[0]
       this.storeRawData({"age-category": fallback})
       console.warn("Invalid age-category '" + this.state["age-category"] + "' was replaced by fallback '" + fallback + "'.")
     }
+
     // check country
     if (this.state.countryChoices.indexOf(this.state.country) === -1) {
       fallback = this.state.countryChoices[0]
       this.storeRawData({country: fallback})
       console.warn("Invalid country '" + this.state.country + "' was replaced by fallback '" + fallback + "'.")
     }
+
     // check relationship
     if (this.state.relationshipChoices.indexOf(this.state.relationship) === -1) {
       fallback = this.state.relationshipChoices[0]
@@ -1524,8 +1540,8 @@ class PageSelector extends Component {
       console.warn("Invalid relationship '" + this.state.relationship + "' was replaced by fallback '" + fallback + "'.")
     }
 
-    // check authentication, prevent to browse beyond login page
-    // note: this is not a very secure method, as setting the state of authenticated to true manually  would override the statement below
+    // prevent user to browse beyond login page if not authenticated
+    // note: this is not a very secure method, as setting the state of authenticated to true manually would let the user set the state of currentPage to any valid page
     if (!this.state.authenticated && this.state.currentPage !== "login" && this.state.currentPage !== null) {
       this.storeRawData({currentPage: "login"})
     }
@@ -1585,11 +1601,13 @@ class PageSelector extends Component {
     delete this.state.errorMessage
     if (this.state.admin === true && input.target.id === "createProfile") {
       this.setState({adminEmail: this.state.email})
-      this.api(
-        "showProfiles",
-        {email: this.state.email},
-        "backgroundQuerySpinner"
-      )
+      if (!this.state.userProfiles) {
+        this.api(
+          "adminShowProfiles",
+          {email: this.state.email},
+          "backgroundQuerySpinner"
+        )
+      }
     }
     else if (typeof this.state.adminEmail !== "undefined") {
       this.setState({email: this.state.adminEmail})
@@ -1667,9 +1685,21 @@ class PageSelector extends Component {
     defaultUserState.authenticated = false
     this.setState(defaultUserState)
     delete this.state.admin
+    delete this.state.adminEmail
+    delete this.state.birthday
+    delete this.state.babyNameCount
+    delete this.state.babyNames
+    delete this.state.babyNameList
+    delete this.state.selectedGender
+    delete this.state.selectedCountry
+    delete this.state.selectedAgeCategory
+    delete this.state.selectedBabyNames
+    delete this.state.userProfiles
     delete this.state.firstLogin
     delete this.state.voted
     delete this.state.profileComplete
+    delete this.state.errorType
+    delete this.state.stackTrace
   }
 
   // used on the CreateProfile page
@@ -1701,7 +1731,7 @@ class PageSelector extends Component {
         ageCategory = this.state["age-category"]
       }
       this.api(
-        "createUser",
+        "completeProfile",
         {
           email: this.state.email,
           gender: this.state.gender,
@@ -1723,23 +1753,50 @@ class PageSelector extends Component {
     }
   }
 
+  adminUpdateProfile() {
+    var birthday = this.state.year + "/" + this.state.month + "/" + this.state.day
+    var ageCategory = "null"
+    if (this.state.hideBirthday) {
+      birthday = "null"
+      ageCategory = this.state["age-category"]
+    }
+    this.api(
+        "adminCompleteProfile",
+        {
+          email: this.state.email,
+          adminEmail: this.state.adminEmail,
+          gender: this.state.gender,
+          name: this.state.name,
+          birthday: birthday,
+          "age-category": ageCategory,
+          country: this.state.country,
+          relationship: this.state.relationship,
+          firstLogin: this.state.firstLogin,
+          profileComplete: this.state.profileComplete,
+          voted: this.state.voted,
+        }
+      )  
+  }
   switchProfile(input) {
-    let profileNumber = input.target.value
+    let profileNumber = input.target ? input.target.value : input
     let selectedProfile = this.state.userProfiles[profileNumber]
-    console.log(profileNumber,selectedProfile)
+    // do not let the user profile override the current state of the app for the admin
     if (typeof selectedProfile.admin !== "undefined") {delete selectedProfile.admin}
     if (typeof selectedProfile.authenticated !== "undefined") {delete selectedProfile.authenticated}
     if (typeof selectedProfile.currentPage !== "undefined") {delete selectedProfile.currentPage}
+    // if user does not have a name, replace it by an empty string
+    if (typeof selectedProfile.name === "undefined") {selectedProfile.name = ""}
     this.setState(selectedProfile)
   }
 
   deleteProfile() {
     this.api(
-      "deleteProfile",
+      "adminDeleteUser",
       {
         email: this.state.email,
-      adminEmail: this.state.adminEmail
-      }
+        adminEmail: this.state.adminEmail
+      },
+      false
     )
   }
 
@@ -1755,11 +1812,17 @@ class PageSelector extends Component {
   reloadApp() {
     this.api(
       "auto-login",
-      {email: this.state.email},
+      {email: this.state.adminEmail ? this.state.adminEmail : this.state.email},
       true,
       true
     )
     this.getBabyNames()
+    this.api(
+      "adminShowProfiles",
+      {email: this.state.adminEmail ? this.state.adminEmail : this.state.email},
+      true,
+      true
+    )
   }
 
   /* used on the ChooseBabyNames */
@@ -1871,7 +1934,7 @@ class PageSelector extends Component {
       requestObject.country = this.state.country
       requestObject.relationship = this.state.relationship
       this.api(
-        "addBabyNames",
+        "saveBabyNameVotes",
         requestObject,
       )
     }
@@ -1885,7 +1948,7 @@ class PageSelector extends Component {
     requestObject.email = this.state.email
     requestObject.newBabyNameCount = this.state.maxNewBabyNames
     this.api(
-      "deleteBabyNames",
+      "adminDeleteBabyNames",
       requestObject,
     )
   }
@@ -1921,7 +1984,7 @@ class PageSelector extends Component {
   }
 
   // API calls
-  api(request, data, spinner = true, filterOutCurrentPage = false) {
+  api(request, data, spinner = true, filterOutCurrentPage = false, doNotDeleteUserInfo = false) {
     // validate request
     if (typeof data === 'object' && typeof request === "string") {
         if (request.length && typeof data === "object") {
@@ -1934,9 +1997,11 @@ class PageSelector extends Component {
           this.setState({ready:false})
         }
         // clear errors
-        this.setState({errors: {}})
-        delete this.state.errorMessage
-        delete this.state.userInfo
+        if (!doNotDeleteUserInfo) {
+          this.setState({errors: {}})
+          delete this.state.errorMessage
+          delete this.state.userInfo
+        }
         $.ajax({
           type: "GET",
           url: "https://bu67qviz40.execute-api.us-west-2.amazonaws.com/prod",
@@ -1965,10 +2030,6 @@ class PageSelector extends Component {
               }
               // saves response in the state
               this.setState(response)
-              // parses birthday into year, month, and day
-              if (typeof response.birthday !== "undefined" && response.birthday !== "null") {
-                // TODO
-              }
               // parse baby names into an array (used to check if name has already been submitted when user votes)
               if (typeof response.babyNames !== "undefined") {
                 let babyNameList = response.babyNames.map(babyNameData => {
@@ -1976,13 +2037,26 @@ class PageSelector extends Component {
                 })
                 this.setState({babyNameList: babyNameList})
               }
-              // refresh baby names after user has voted
-              if (request === "addBabyNames" || request === "deleteBabyNames") {
+              // refresh baby names after user has voted or admin has deleted names
+              if (request === "saveBabyNameVotes" || request === "adminDeleteBabyNames") {
                 this.api(
                   "showBabyNames",
                   {email: this.state.email},
                   "backgroundQuerySpinner",
-                  )
+                  false,
+                  request === "adminDeleteBabyNames" ? true : false
+                )
+              }
+              // refresh list of profiles after admin has deleted profiles
+              if (request === "adminDeleteUser" || request === "adminCompleteProfile") {
+                this.switchProfile(0)
+                this.api(
+                  "adminShowProfiles",
+                  {email: this.state.adminEmail ? this.state.adminEmail : this.state.email},
+                  false,
+                  false,
+                  true
+                )
               }
               // no error
               if (typeof response.errorMessage === "undefined") {
@@ -2129,6 +2203,7 @@ class PageSelector extends Component {
             storeData={this.storeData}
             errors={this.state.errors}
             submitProfile={this.submitProfile}
+            adminUpdateProfile={this.adminUpdateProfile}
             switchProfile={this.switchProfile}
             deleteProfile={this.deleteProfile}
             profileComplete={this.state.profileComplete}
@@ -2143,8 +2218,6 @@ class PageSelector extends Component {
             // authenticated={this.state.authenticated}
             // currentPage={this.state.currentPage}
             voted={this.state.voted}
-            profileComplete={this.state.profileComplete}
-            language={this.state.language}
           />
         )
         break
