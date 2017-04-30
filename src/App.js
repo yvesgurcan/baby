@@ -778,8 +778,12 @@ class CreateProfile extends Component {
       en: [{id:"24-",name:"24 or younger"},{id:"25-49",name:"between 25 and 49"},{id:"50-74",name:"between 50 and 74"},{id:"75+",name:"75 or older"}],
     }
     let ageCategories = this.props.ageCategoryChoices.map((category,index) => {
-      // console.log(category)
-      return <option key={category} value={category}>{categories[this.props.language][index].name}</option>
+      if (categories[this.props.language][index]) {
+        return <option key={category} value={category}>{categories[this.props.language][index].name}</option>
+      }
+      else {
+        return null
+      }
     })
     return ageCategories
   }
@@ -868,7 +872,7 @@ class CreateProfile extends Component {
             <Col sm={10} xs={12}>
               <FormControl
                 name="profiles"
-                /*value={this.props.gender}*/
+                value={this.props.selectedProfile}
                 componentClass="select"
                 bsSize="large"
                 className="margin-bottom"
@@ -886,53 +890,75 @@ class CreateProfile extends Component {
         {
           this.props.admin !== true ? null :
           <Col>
-            <Col sm={3} xs={12}>
+            <Col sm={4} xs={12}>
               <label>Created:&nbsp;</label>{this.props.created}
             </Col>
+            <Col sm={5} xs={12}>
+              <label>Last login:&nbsp;</label>{this.props.lastLogin} {this.props.lastSession && this.props.lastSession !== " " ? <span>({this.props.lastSession.replace("minutes","min")})</span> : null}
+            </Col>
             <Col sm={3} xs={12}>
-              <label>Last login:&nbsp;</label>{this.props.lastLogin} ({this.props.lastSession})
-            </Col>
-            <Col sm={2} xs={12}>
-            <Checkbox
-                inline
-                name="firstLogin"
-                checked={this.props.firstLogin}
-                bsSize="large"
-                onChange={this.props.storeData}
-                onKeyPress={this.autoSubmitForm}
-                disabled={this.props.admin !== true ? true : false}
-              />
-              <label>First login</label>
-            </Col>
-            <Col sm={2} xs={12}>
-            <Checkbox
-                inline
-                name="profileComplete"
-                checked={this.props.profileComplete}
-                bsSize="large"
-                onChange={this.props.storeData}
-                onKeyPress={this.autoSubmitForm}
-                disabled={this.props.admin !== true ? true : false}
-              />
-              <label>Profile</label>
-            </Col>
-            <Col sm={2} xs={12}>
-            <Checkbox
-                inline
-                name="voted"
-                checked={this.props.voted}
-                bsSize="large"
-                onChange={this.props.storeData}
-                onKeyPress={this.autoSubmitForm}
-                disabled={this.props.admin !== true ? true : false}
-              />
-              <label>Voted</label>
+              <Checkbox
+                  inline
+                  name="userAuthenticated"
+                  checked={this.props.userAuthenticated}
+                  bsSize="large"
+                  onChange={this.props.storeData}
+                  onKeyPress={this.autoSubmitForm}
+                  disabled={this.props.admin !== true ? true : false}
+                />
+              <label>Logged in</label>
             </Col>
             <Clearfix/>
+            <Col sm={4} xs={12}>
+              <label>Page:&nbsp;</label>{this.props.userCurrentPage}
+            </Col>
+            <Col sm={2} xs={12}>
+              <Checkbox
+                  inline
+                  name="firstLogin"
+                  checked={this.props.firstLogin}
+                  bsSize="large"
+                  onChange={this.props.storeData}
+                  onKeyPress={this.autoSubmitForm}
+                  disabled={this.props.admin !== true ? true : false}
+                />
+              <label>1st login</label>
+            </Col>
+            <Col sm={3} xs={12}>
+              <Checkbox
+                  inline
+                  name="profileComplete"
+                  checked={this.props.profileComplete}
+                  bsSize="large"
+                  onChange={this.props.storeData}
+                  onKeyPress={this.autoSubmitForm}
+                  disabled={this.props.admin !== true ? true : false}
+                />
+              <label>Profile Complete</label>
+            </Col>
+            <Col sm={2} xs={12}>
+              <Checkbox
+                  inline
+                  name="voted"
+                  checked={this.props.voted}
+                  bsSize="large"
+                  onChange={this.props.storeData}
+                  onKeyPress={this.autoSubmitForm}
+                  disabled={this.props.admin !== true ? true : false}
+                />
+              <label>Voted</label>
+            </Col>
+            <Col sm={6} xs={12}>
+              <label>Suggested Names:&nbsp;</label>{this.props.suggestedBabyNames}
+            </Col>
+            <Col sm={6} xs={12}>
+              <label>Favorite Names:&nbsp;</label>{this.props.babyNameVotes}
+            </Col>
             <hr/>
           </Col>
         }
         <Clearfix/>
+        <hr/>
         <Col sm={2}>
           <span className="hidden-xs">
             <FormControl
@@ -994,7 +1020,7 @@ class CreateProfile extends Component {
           />
         </Col>
         <Row>
-          {!this.props.hideBirthday ?
+          {this.props.hideBirthday ? null :
           <Col sm={11}>
             <Col sm={1}></Col>
             {box1}
@@ -1014,7 +1040,8 @@ class CreateProfile extends Component {
               </FormControl>
             </Col>
           </Col>
-          :
+          }
+          {!this.props.hideBirthday  ? null :
           <Col sm={11}>
             <Col smOffset={3} sm={6}>
               <FormControl
@@ -1697,6 +1724,7 @@ class PageSelector extends Component {
     this.setState(defaultUserState)
     delete this.state.admin
     delete this.state.adminEmail
+    delete this.state.originalEmail
     delete this.state.birthday
     delete this.state.babyNameCount
     delete this.state.babyNames
@@ -1711,6 +1739,10 @@ class PageSelector extends Component {
     delete this.state.profileComplete
     delete this.state.errorType
     delete this.state.stackTrace
+    delete this.state.created
+    delete this.state.lastLogin
+    delete this.state.lastSession
+    delete this.state.userAuthenticated
   }
 
   // used on the CreateProfile page
@@ -1765,11 +1797,15 @@ class PageSelector extends Component {
   }
 
   adminUpdateProfile() {
-    var birthday = this.state.year + "/" + this.state.month + "/" + this.state.day
-    var ageCategory = "null"
+    let birthday = "null"
+    let ageCategory = "null"
     if (this.state.hideBirthday) {
       birthday = "null"
       ageCategory = this.state["age-category"]
+    }
+    else {
+      birthday = this.state.year + "/" + this.state.month + "/" + this.state.day
+      ageCategory = "null"
     }
     this.api(
         "adminCompleteProfile",
@@ -1785,6 +1821,7 @@ class PageSelector extends Component {
           firstLogin: this.state.firstLogin,
           profileComplete: this.state.profileComplete,
           voted: this.state.voted,
+          authenticated: this.state.userAuthenticated,
         }
       )  
   }
@@ -1793,14 +1830,49 @@ class PageSelector extends Component {
     let selectedProfile = this.state.userProfiles[profileNumber]
     // do not let the user profile override the current state of the app for the admin
     if (typeof selectedProfile.admin !== "undefined") {delete selectedProfile.admin}
-    if (typeof selectedProfile.authenticated !== "undefined") {delete selectedProfile.authenticated}
-    if (typeof selectedProfile.currentPage !== "undefined") {delete selectedProfile.currentPage}
+    if (typeof selectedProfile.authenticated !== "undefined") {
+      selectedProfile.userAuthenticated = selectedProfile.authenticated
+      delete selectedProfile.authenticated
+    }
+    if (typeof selectedProfile.currentPage !== "undefined") {
+      selectedProfile.userCurrentPage = selectedProfile.currentPage
+      delete selectedProfile.currentPage
+    }
+    // parse birthday
+    let birthday = selectedProfile.birthday ? selectedProfile.birthday.match(/[0-9]{4}\/[0-9]{1,2}\/[0-9]{1,2}/) : null
+    if (birthday) {
+      selectedProfile.hideBirthday = false
+      birthday = birthday[0]
+      selectedProfile.year = birthday.match(/[0-9]{4}/)[0]
+      let monthAndDay = birthday.replace(selectedProfile.year + "/","")
+      selectedProfile.month = monthAndDay.match(/[0-9]{1,2}\//)[0].replace("/","")
+      selectedProfile.day = monthAndDay.match(/\/[0-9]{1,2}/)[0].replace("/","")
+    }
+    else if (selectedProfile.profileComplete) {
+      selectedProfile.birthday = null
+      this.setState({
+        year: defaultState.year,
+        month: defaultState.month,
+        day: defaultState.day,
+      })
+      if (selectedProfile["age-category"] !== null) {
+        selectedProfile.hideBirthday = true
+      }
+    }
+    else {
+      console.log(defaultState)
+      this.setState({
+        year: defaultState.year,
+        month: defaultState.month,
+        day: defaultState.day,
+      })
+    }
     // if user does not have a name, replace it by an empty string
     if (typeof selectedProfile.name === "undefined") {selectedProfile.name = ""}
     // store the current email address of the user
     // used to signify that admin will create a new user if they change the email address
-    selectedProfile.originalEmail = selectedProfile.email
     this.setState(selectedProfile)
+    this.setState({selectedProfile: profileNumber, originalEmail: selectedProfile.email})
   }
 
   deleteProfile() {
@@ -1983,8 +2055,12 @@ class PageSelector extends Component {
     }
     else {
       let value = input.target.value
+      // convert value to number
+      if (input.target.name === "day" || input.target.name === "month" || input.target.name === "year") {
+        value = Number(value)
+      }
       // capitalize the first letter of every word
-      if (input.target.name.indexOf("newBabyName") > -1 || input.target.name.indexOf("name") > -1) {
+      else if (input.target.name.indexOf("newBabyName") > -1 || input.target.name.indexOf("name") > -1) {
         value = value.replace(/\w\S*/g, function(value){return value.charAt(0).toUpperCase() + value.substr(1).toLowerCase()})
       }
       state[input.target.name] = value
@@ -2063,7 +2139,12 @@ class PageSelector extends Component {
               }
               // refresh list of profiles after admin has deleted profiles
               if (request === "adminDeleteUser" || request === "adminCompleteProfile") {
-                this.switchProfile(0)
+                let selectedProfile = 0
+                if (request === "adminCompleteProfile") {
+                  selectedProfile = this.state.selectedProfile
+                }
+                this.switchProfile(selectedProfile)
+
                 this.api(
                   "adminShowProfiles",
                   {email: this.state.adminEmail ? this.state.adminEmail : this.state.email},
@@ -2071,6 +2152,9 @@ class PageSelector extends Component {
                   false,
                   true
                 )
+              }
+              if (request === "adminShowProfiles") {
+                this.switchProfile(this.state.selectedProfile ? this.state.selectedProfile : 0)
               }
               // no error
               if (typeof response.errorMessage === "undefined") {
@@ -2089,8 +2173,8 @@ class PageSelector extends Component {
                 }
                 console.error(
                   "Request failed.",
-                  "\nData sent:",data,
-                  "\nError message:", JSON.stringify(response.errorMessage),
+                  "\nData sent:", data,
+                  "\nError message:", response.errorMessage,
                   "\nError details:", errorDetails,
                 )
               }
@@ -2232,6 +2316,10 @@ class PageSelector extends Component {
             // currentPage={this.state.currentPage}
             voted={this.state.voted}
             originalEmail={this.state.originalEmail}
+            userCurrentPage={this.state.userCurrentPage}
+            userAuthenticated={this.state.userAuthenticated}
+            suggestedBabyNames={this.state.suggestedBabyNames}
+            babyNameVotes={this.state.babyNameVotes}
           />
         )
         break
