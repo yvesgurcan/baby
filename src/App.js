@@ -377,7 +377,10 @@ class ShowBabyNameStats extends Component {
   }
   render() {
 
-    if (this.props.babyNames.length === 0) {
+    if (!this.props.backgroundQueryReady) {
+      return <LocalSpinner/>
+    }
+    else if (this.props.babyNames.length === 0) {
       return null
     }
 
@@ -503,20 +506,24 @@ class ShowBabyNameStats extends Component {
         */
       )
       return (
-        <Button
-          style={{
-            paddingTop: paddingVertical + "px",
-            paddingBottom: paddingVertical + "px",
-            paddingLeft: paddingHorizontal + "px",
-            paddingRight: paddingHorizontal + "px",
-          }}
-          key={babyName.name}
-          bsSize="large"
-          bsStyle="success"
-          className="margin-bottom margin-right"
-        >
-          {babyName.name}
-        </Button>
+          <Button
+            style={{
+              paddingTop: paddingVertical + "px",
+              paddingBottom: paddingVertical + "px",
+              paddingLeft: paddingHorizontal + "px",
+              paddingRight: paddingHorizontal + "px",
+              lineHeight: "1",
+            }}
+            key={babyName.name}
+            bsSize="large"
+            bsStyle="success"
+            className="margin-bottom margin-right"
+          >
+            {babyName.name}
+            <small><small><small>
+              <br/>{babyNameVotes[index]} votes
+            </small></small></small>
+          </Button>
       )
     })
     console.log("-----")
@@ -560,6 +567,14 @@ class ChooseBabyNames extends Component {
     }
     else if (this.props.babyNames) {
       babyNames = this.props.babyNames.map(babyName => {
+        let selected = false
+        if (this.props.selectedBabyNames) {
+          this.props.selectedBabyNames.split(",").map(selectedBabyName => {
+            if (selectedBabyName === babyName.name) {
+              selected = true
+            }
+          })
+        }
         return (
           <Button
             key={babyName.name}
@@ -567,7 +582,7 @@ class ChooseBabyNames extends Component {
             bsSize="large"
             bsStyle="success"
             className="margin-bottom margin-right"
-            active={String(this.props.selectedBabyNames).indexOf(babyName.name) > -1 ? true : false}
+            active={selected}
             onClick={this.props.selectBabyName}
             disabled={this.props.voted && this.props.admin !== true ? true : false}
           >
@@ -1732,6 +1747,7 @@ class PageSelector extends Component {
     delete this.state.selectedGender
     delete this.state.selectedCountry
     delete this.state.selectedAgeCategory
+    delete this.state.selectedRelationship
     delete this.state.selectedBabyNames
     delete this.state.userProfiles
     delete this.state.firstLogin
@@ -1743,6 +1759,7 @@ class PageSelector extends Component {
     delete this.state.lastLogin
     delete this.state.lastSession
     delete this.state.userAuthenticated
+    delete this.state.suggestedBabyNames
   }
 
   // used on the CreateProfile page
@@ -1935,7 +1952,7 @@ class PageSelector extends Component {
     let error = false
     let errorMessages = this.state.errors
     
-    let selectableNameCount = Math.min(this.state.maxSelectableBabyNames,this.state.nameCount)
+    let selectableNameCount = Math.min(this.state.maxSelectableBabyNames,this.state.babyNameCount)
     let selectedBabyNames = this.state.selectedBabyNames
     selectedBabyNames = selectedBabyNames.substring(0,selectedBabyNames.lastIndexOf(",")).split(",")
     let selectedNameCount = this.state.selectedBabyNames === "" ? 0 : selectedBabyNames.length
@@ -2016,9 +2033,6 @@ class PageSelector extends Component {
       requestObject.email = this.state.email
       requestObject.newBabyNameCount = this.state.maxNewBabyNames
       requestObject.selectedBabyNames = this.state.selectedBabyNames
-      requestObject.gender = this.state.gender
-      requestObject.country = this.state.country
-      requestObject.relationship = this.state.relationship
       this.api(
         "saveBabyNameVotes",
         requestObject,
@@ -2367,6 +2381,7 @@ class PageSelector extends Component {
             selectedCountry={this.state.selectedCountry}
             selectedRelationship={this.state.selectedRelationship}
             selectedAgeCategory={this.state.selectedAgeCategory}
+            backgroundQueryReady={this.state.backgroundQueryReady}
           />
         )
         break
