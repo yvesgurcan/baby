@@ -14,7 +14,7 @@ const defaultState = {
   gender: "M",
   genderChoices: ["F","M"],
   day: 1,
-  month: "January",
+  month: 1,
   year: 1960,
   minYear: Math.floor((currentYear - 80) / 5) * 5,
   maxYear: Math.ceil((currentYear - 15) / 5) * 5,
@@ -573,6 +573,7 @@ class ChooseBabyNames extends Component {
             if (selectedBabyName === babyName.name) {
               selected = true
             }
+            return null
           })
         }
         return (
@@ -1337,6 +1338,7 @@ class PageSelector extends Component {
     super(props)
 
     this.URLfragments = this.URLfragments.bind(this)
+    this.translation = this.translation.bind(this)
     this.switchLanguage = this.switchLanguage.bind(this)
     this.loginSwitchLanguage = this.loginSwitchLanguage.bind(this)
     this.submitLanguageShift = this.submitLanguageShift.bind(this)
@@ -1387,6 +1389,9 @@ class PageSelector extends Component {
     defaultUserState.warnings =  {}
     defaultUserState.ready = true
     defaultUserState.backgroundQueryReady = true
+
+    // set window title
+    document.title = this.translation()[defaultUserState.language].windowTitle
 
     // check default max number of new baby names
     const arbitraryMaxNewBabyNames = 3
@@ -1615,9 +1620,21 @@ class PageSelector extends Component {
 
   }
 
+  translation() {
+    return {
+      en: {
+        windowTitle: "Ashlee and Yves's surprise"
+      },
+      fr: {
+        windowTitle: "La surprise d'Ashlee et Yves"
+      },
+    }
+  }
+
   /* used on Flags component */
   switchLanguage(language) {
     this.setState({language: language})
+    document.title = this.translation()[this.state.language].windowTitle
   }
   loginSwitchLanguage(input) {
     let language = input.target.id
@@ -1640,6 +1657,11 @@ class PageSelector extends Component {
   // used on Flags page
   goToLogin() {
     this.setState({currentPage: "login"})
+    let userInfo = {
+      en: "Good morning ! / Good evening ! It is nice to have you here. Please enter your email address and the secret password that was communicated to you.",
+      fr: "Bonjour ! / Bonsoir ! Heureux de vous avoir parmi nous. Veuillez entre votre adresse email et le mot de passe qui vous a ete communique.",
+    }
+    this.setUserInfoMessage(userInfo)
   }
 
   // used on Announcement page
